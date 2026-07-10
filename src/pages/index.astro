@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { gospelLessons } from '../content/lessons';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="HRE4M Interactive Learning Hub"
+  description="Interactive Grade 12 Catholic Religion lessons for exegesis and the Four Senses of Scripture."
+  className="hub-page"
+>
+  <header class="hub-header">
+    <a class="brand" href={base} aria-label="HRE4M Interactive Learning Hub home">
+      <span class="brand-mark" aria-hidden="true">H</span>
+      <span><strong>HRE4M</strong><small>Interactive Learning Hub</small></span>
+    </a>
+    <span class="course-chip">Grade 12 · Catholic Religion</span>
+  </header>
+
+  <main id="main-content">
+    <section class="hub-hero" aria-labelledby="hub-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Unit 2 is now open</p>
+        <h1 id="hub-title">Read closely.<br /><em>Think deeply.</em></h1>
+        <p class="hero-lede">
+          A Scripture lab for learning exegesis and the Four Senses through the distinct voices of
+          Matthew, Mark, Luke, and John.
+        </p>
+        <a class="primary-link" href="#gospel-labs">Choose a Gospel <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-orbit" aria-hidden="true">
+        <span class="orbit-label">UNIT</span>
+        <strong>02</strong>
+        <span class="orbit-note orbit-note-one">EXEGESIS</span>
+        <span class="orbit-note orbit-note-two">FOUR SENSES</span>
+        <span class="orbit-note orbit-note-three">CONTEXT</span>
+      </div>
+    </section>
+
+    <section class="unit-overview" aria-label="Unit 2 overview">
+      <div>
+        <span class="overview-number">01</span>
+        <p><strong>Begin with the text</strong><br />Author · audience · genre · context</p>
+      </div>
+      <div>
+        <span class="overview-number">02</span>
+        <p><strong>Interpret with care</strong><br />Exegesis before application</p>
+      </div>
+      <div>
+        <span class="overview-number">03</span>
+        <p><strong>Read four ways</strong><br />Literal · allegorical · moral · anagogical</p>
+      </div>
+    </section>
+
+    <section class="labs-section" id="gospel-labs" aria-labelledby="labs-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Four distinct lenses</p>
+          <h2 id="labs-title">Choose your Gospel laboratory</h2>
+        </div>
+        <p>Each lab uses the same learning structure with a visual language shaped by its Gospel.</p>
+      </div>
+
+      <div class="gospel-grid">
+        {gospelLessons.map((lesson, index) => (
+          <a
+            class="gospel-card"
+            href={`${base}unit-2/${lesson.shortName.toLowerCase()}/`}
+            style={`--card-primary:${lesson.theme.colors.primary};--card-accent:${lesson.theme.colors.accent};--card-bg:${lesson.theme.colors.surface};--card-text:${lesson.theme.colors.text};--card-border:${lesson.theme.colors.border};`}
+          >
+            <div class="gospel-card-top">
+              <span class="card-index">0{index + 1}</span>
+              <span class="card-symbol" aria-hidden="true">{lesson.symbol}</span>
+            </div>
+            <div>
+              <p>{lesson.theme.motif}</p>
+              <h3>{lesson.shortName}</h3>
+              <span>{lesson.passages.length} passage investigations · local autosave</span>
+            </div>
+            <span class="card-action">Enter lab <b aria-hidden="true">↗</b></span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="future-units" aria-labelledby="future-title">
+      <div>
+        <p class="eyebrow">Designed to grow</p>
+        <h2 id="future-title">One hub. Several units.</h2>
+        <p>
+          Unit 2 establishes the shared lesson engine. Future course units can add timelines,
+          moral issue labs, sacrament explorations, and reflection studios without rebuilding the hub.
+        </p>
+      </div>
+      <div class="future-list" aria-label="Future unit placeholders">
+        <span><b>03</b> Christian Moral Life <em>Planned</em></span>
+        <span><b>04</b> Catholic Social Teaching <em>Planned</em></span>
+        <span><b>05</b> Prayer & Spirituality <em>Planned</em></span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="hub-footer">
+    <span>HRE4M Interactive Learning Hub</span>
+    <span>Use your NRSV / NRSV-CE Bible alongside each activity.</span>
+  </footer>
+</BaseLayout>
