@@ -8,7 +8,7 @@ export default defineConfig({
   integrations: [svelte()],
   output: 'static',
   site: process.env.SITE_URL || (owner ? `https://${owner}.github.io` : 'https://example.github.io'),
-  base: isProjectPage ? `/${repository}` : '/',
+  base: isProjectPage ? `/${repository}/` : '/',
   vite: {
     build: {
       sourcemap: false,
