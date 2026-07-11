@@ -11,6 +11,9 @@ export type PassageResponse = {
   anagogical: string;
   exit: string;
   exemplarViewed: boolean;
+  evidenceChecklist: string[];
+  exemplarReflection: string;
+  hintLevel: number;
 };
 
 export type LessonState = {
@@ -30,6 +33,9 @@ export const emptyPassageResponse = (): PassageResponse => ({
   anagogical: '',
   exit: '',
   exemplarViewed: false,
+  evidenceChecklist: [],
+  exemplarReflection: '',
+  hintLevel: 0,
 });
 
 export const emptyLessonState = (): LessonState => ({
@@ -71,10 +77,21 @@ export function loadLessonState(lessonId: string, student: StudentInfo): LessonS
   try {
     const value = localStorage.getItem(lessonStorageKey(lessonId, student));
     if (!value) return emptyLessonState();
-    return { ...emptyLessonState(), ...(JSON.parse(value) as Partial<LessonState>) };
+    return normalizeLessonState(JSON.parse(value) as Partial<LessonState>);
   } catch {
     return emptyLessonState();
   }
+}
+
+export function normalizeLessonState(value: Partial<LessonState>): LessonState {
+  const base = emptyLessonState();
+  const responses = Object.fromEntries(
+    Object.entries(value.responses ?? {}).map(([id, response]) => [
+      id,
+      { ...emptyPassageResponse(), ...(response as Partial<PassageResponse>) },
+    ]),
+  );
+  return { ...base, ...value, responses };
 }
 
 export function saveLessonState(lessonId: string, student: StudentInfo, state: LessonState): void {
@@ -86,4 +103,64 @@ export function saveLessonState(lessonId: string, student: StudentInfo, state: L
 
 export function clearLessonState(lessonId: string, student: StudentInfo): void {
   localStorage.removeItem(lessonStorageKey(lessonId, student));
+}
+
+export type LessonBackup = {
+  kind: 'hre4m-lesson-backup';
+  version: 2;
+  lessonId: string;
+  exportedAt: string;
+  student: StudentInfo;
+  state: LessonState;
+};
+
+export function createLessonBackup(lessonId: string, student: StudentInfo, state: LessonState): LessonBackup {
+  return {
+    kind: 'hre4m-lesson-backup',
+    version: 2,
+    lessonId,
+    exportedAt: new Date().toISOString(),
+    student,
+    state: normalizeLessonState(state),
+  };
+}
+
+export function parseLessonBackup(value: unknown, expectedLessonId: string): LessonBackup {
+  if (!value || typeof value !== 'object') throw new Error('This file is not a valid HRE4M backup.');
+  const candidate = value as Partial<LessonBackup>;
+  if (candidate.kind !== 'hre4m-lesson-backup' || !candidate.student || !candidate.state) {
+    throw new Error('This file is not a valid HRE4M backup.');
+  }
+  if (candidate.lessonId !== expectedLessonId) {
+    throw new Error('This backup belongs to a different Gospel lesson.');
+  }
+  return {
+    kind: 'hre4m-lesson-backup',
+    version: 2,
+    lessonId: expectedLessonId,
+    exportedAt: candidate.exportedAt ?? new Date().toISOString(),
+    student: candidate.student,
+    state: normalizeLessonState(candidate.state),
+  };
+}
+
+function recoveryKey(lessonId: string, student: StudentInfo): string {
+  return `${lessonStorageKey(lessonId, student)}:recovery`;
+}
+
+export function saveRecoverySnapshot(lessonId: string, student: StudentInfo, state: LessonState): void {
+  localStorage.setItem(recoveryKey(lessonId, student), JSON.stringify(normalizeLessonState(state)));
+}
+
+export function loadRecoverySnapshot(lessonId: string, student: StudentInfo): LessonState | null {
+  try {
+    const value = localStorage.getItem(recoveryKey(lessonId, student));
+    return value ? normalizeLessonState(JSON.parse(value) as Partial<LessonState>) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearRecoverySnapshot(lessonId: string, student: StudentInfo): void {
+  localStorage.removeItem(recoveryKey(lessonId, student));
 }

@@ -25,6 +25,7 @@ export function buildStudentExport(lesson: GospelLesson, student: StudentInfo, s
     if (response.moral.trim()) lines.push(`\nMoral\n${response.moral.trim()}`);
     if (response.anagogical.trim()) lines.push(`\nAnagogical\n${response.anagogical.trim()}`);
     if (response.exit.trim()) lines.push(`\nExit Check\n${response.exit.trim()}`);
+    if (response.exemplarReflection.trim()) lines.push(`\nExemplar Comparison Reflection\n${response.exemplarReflection.trim()}`);
   }
 
   if (state.synthesis.trim()) lines.push(heading('Final Synthesis'), `\n${state.synthesis.trim()}`);

@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+---
+
+<BaseLayout
+  title="Privacy & Student Data · HRE4M Learning Hub"
+  description="How the HRE4M Interactive Learning Hub stores and handles student information."
+  className="privacy-page"
+>
+  <main id="main-content" class="privacy-shell">
+    <a href={base}>← Learning Hub</a>
+    <article>
+      <p class="privacy-kicker">HRE4M Learning Hub</p>
+      <h1>Privacy & student data</h1>
+      <p class="privacy-lede">The hub is designed to work without student accounts, tracking profiles, or an application database.</p>
+
+      <section>
+        <h2>What stays on the device</h2>
+        <p>Student name, class period, passage responses, quiz choices, progress, synthesis writing, and recovery snapshots are stored in the browser on the device being used.</p>
+      </section>
+      <section>
+        <h2>What assignment links contain</h2>
+        <p>Teacher-generated links contain lesson settings such as Gospel, required passages, due date, and enabled activities. They do not contain student names or responses.</p>
+      </section>
+      <section>
+        <h2>Moving or submitting work</h2>
+        <p>Students decide when to download a text export, print/PDF report, or portable HRE4M backup. A backup contains the student information and responses shown in the lesson and should be handled like any other piece of schoolwork.</p>
+      </section>
+      <section>
+        <h2>Clearing information</h2>
+        <p>Students can clear lesson responses or remove both their work and student information from the collection view. Clearing browser site data may also remove locally saved work, so students should download a backup first.</p>
+      </section>
+      <section>
+        <h2>Hosting</h2>
+        <p>The public site is hosted through GitHub Pages. The learning hub does not include its own analytics, advertising, or third-party tracking scripts.</p>
+      </section>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .privacy-shell { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 90px; }
+  .privacy-shell > a { color: #314477; font-size: .76rem; font-weight: 800; text-decoration: none; }
+  article { margin-top: 34px; padding: clamp(28px, 6vw, 68px); border: 1px solid #ded6c5; border-radius: 28px; background: #fffdf8; color: #17203c; }
+  .privacy-kicker { margin: 0 0 12px; color: #9a6a24; font-size: .67rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+  h1 { margin: 0; font: 400 clamp(3rem, 7vw, 5.8rem)/.95 Georgia, serif; letter-spacing: -.045em; }
+  .privacy-lede { max-width: 650px; margin: 24px 0 42px; color: #646779; font-size: 1.05rem; line-height: 1.7; }
+  section { padding: 24px 0; border-top: 1px solid #e1dacb; }
+  h2 { margin: 0 0 9px; font: 400 1.45rem Georgia, serif; }
+  section p { margin: 0; color: #686b78; line-height: 1.7; }
+</style>

@@ -29,7 +29,14 @@ export function completionSummary(lesson: GospelLesson, state: LessonState) {
   const literalPassages = lesson.passages.filter((passage) => literalComplete(state.responses[passage.id])).length;
   const quizCorrect = lesson.quiz.filter((item) => state.quizAnswers[item.id] === item.answer).length;
   const sortCorrect = lesson.sortingActivity.filter((item) => state.sortAnswers[item.id] === item.answer).length;
-  const totalCheckpoints = lesson.passages.length * 5 + lesson.quiz.length + lesson.sortingActivity.length + 2;
+  const requireSynthesis = lesson.requirements?.synthesis ?? true;
+  const requireReflection = lesson.requirements?.reflection ?? true;
+  const totalCheckpoints =
+    lesson.passages.length * 5 +
+    lesson.quiz.length +
+    lesson.sortingActivity.length +
+    (requireSynthesis ? 1 : 0) +
+    (requireReflection ? 1 : 0);
   let completedCheckpoints = 0;
 
   for (const passage of lesson.passages) {
@@ -44,8 +51,8 @@ export function completionSummary(lesson: GospelLesson, state: LessonState) {
 
   completedCheckpoints += Object.keys(state.quizAnswers).length;
   completedCheckpoints += Object.keys(state.sortAnswers).length;
-  if (state.synthesis.trim().length >= SYNTHESIS_MIN) completedCheckpoints += 1;
-  if (state.reflectionChoice && state.reflectionResponse.trim().length >= 100) completedCheckpoints += 1;
+  if (requireSynthesis && state.synthesis.trim().length >= SYNTHESIS_MIN) completedCheckpoints += 1;
+  if (requireReflection && state.reflectionChoice && state.reflectionResponse.trim().length >= 100) completedCheckpoints += 1;
 
   return {
     fullPassages,

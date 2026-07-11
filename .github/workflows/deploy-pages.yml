@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -32,8 +32,12 @@ jobs:
         env:
           GITHUB_ACTIONS: true
           ASTRO_TELEMETRY_DISABLED: '1'
+      - name: Verify generated routes
+        run: npm run verify:build
+      - name: Test critical assignment and recovery flows
+        run: npm run test:logic
       - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 

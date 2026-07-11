@@ -66,6 +66,10 @@ export type GospelLesson = {
   passages: GospelPassage[];
   quiz: QuizItem[];
   sortingActivity: SortingItem[];
+  requirements?: {
+    synthesis: boolean;
+    reflection: boolean;
+  };
 };
 
 export const defaultPrompts: PassagePrompts = {

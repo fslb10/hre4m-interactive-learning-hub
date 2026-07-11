@@ -6,6 +6,8 @@
   export let passage: GospelPassage;
   export let response: PassageResponse;
   export let teacherMode = false;
+  export let unlockRequired = true;
+  export let exemplarsEnabled = true;
   export let onChange: (response: PassageResponse) => void;
   export let onBack: () => void;
 
@@ -22,13 +24,25 @@
   }
 
   $: literalLength = response.literal.trim().length;
-  $: unlocked = teacherMode || literalLength >= LITERAL_MIN;
+  $: unlocked = teacherMode || !unlockRequired || literalLength >= LITERAL_MIN;
   $: attemptedDeeper = [response.allegorical, response.moral, response.anagogical].some(
     (value) => value.trim().length >= 30,
   );
 
-  function update(field: keyof PassageResponse, value: string | boolean) {
+  function update<K extends keyof PassageResponse>(field: K, value: PassageResponse[K]) {
     onChange({ ...response, [field]: value });
+  }
+
+  const evidenceChecks = [
+    { id: 'people-setting', label: 'I identified the people, setting, and central action.' },
+    { id: 'text-detail', label: 'I used at least one specific detail, image, or repeated word.' },
+    { id: 'gospel-context', label: 'I connected the passage to its place in this Gospel.' },
+    { id: 'observation-inference', label: 'I separated what the text shows from what I infer.' },
+  ];
+
+  function toggleEvidence(id: string) {
+    const current = response.evidenceChecklist ?? [];
+    update('evidenceChecklist', current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   }
 
   function requestExemplar() {
@@ -125,6 +139,19 @@
         <span>{literalLength} characters</span>
         <span class:ready={unlocked}>{unlocked ? 'Context gate open' : `${Math.max(0, LITERAL_MIN - literalLength)} more to unlock`}</span>
       </div>
+      <div class="evidence-checklist">
+        <div><strong>Evidence check</strong><span>{response.evidenceChecklist.length}/{evidenceChecks.length} checked</span></div>
+        {#each evidenceChecks as item}
+          <label><input type="checkbox" checked={response.evidenceChecklist.includes(item.id)} on:change={() => toggleEvidence(item.id)} /><span>{item.label}</span></label>
+        {/each}
+      </div>
+      <div class="hint-ladder">
+        <div><strong>Need a nudge?</strong><span>Open hints one level at a time.</span></div>
+        <button on:click={() => update('hintLevel', Math.min(3, response.hintLevel + 1))} disabled={response.hintLevel >= 3}>{response.hintLevel ? 'Show next hint' : 'Show first hint'}</button>
+        {#if response.hintLevel >= 1}<p><b>Notice</b>Track the passage’s key images: {passage.keyImages.join(', ')}. Which one changes the meaning of the scene?</p>{/if}
+        {#if response.hintLevel >= 2}<p><b>Locate</b>Return to the beginning and ending. Who understands more, acts differently, or responds to Jesus?</p>{/if}
+        {#if response.hintLevel >= 3}<p><b>Start</b>“In {passage.reference}, the passage first shows ____. This matters in {passage.title} because ____.”</p>{/if}
+      </div>
     </div>
 
     {#if !unlocked}
@@ -168,7 +195,7 @@
       <span class="mini-count">{response.exit.trim().length} characters</span>
     </div>
 
-    <section class="exemplar-panel">
+    {#if exemplarsEnabled || teacherMode}<section class="exemplar-panel">
       <div>
         <p>Compare after you attempt</p>
         <h3>Exemplar responses</h3>
@@ -182,8 +209,13 @@
             <article><b>{sense}</b><p>{passage.exemplars[sense as SenseKey]}</p></article>
           {/each}
         </div>
+        <label class="exemplar-reflection">
+          <span>Reflect after comparing</span>
+          <p>What did the exemplar include that your response was missing, or what did your response emphasize differently?</p>
+          <textarea value={response.exemplarReflection} on:input={(event) => update('exemplarReflection', event.currentTarget.value)} rows="4" placeholder="One strength I noticed… One revision I would make…"></textarea>
+        </label>
       {/if}
-    </section>
+    </section>{/if}
   </section>
 </article>
 
@@ -241,6 +273,20 @@
   .writing-status { display: flex; justify-content: space-between; margin-top: 8px; color: var(--lesson-muted); font-size: .68rem; }
   .writing-status span:last-child { font-weight: 780; }
   .writing-status .ready { color: #18725d; }
+  .evidence-checklist { margin-top: 15px; display: grid; gap: 8px; padding: 15px; border: 1px solid var(--lesson-border); border-radius: 11px; background: color-mix(in srgb, var(--lesson-background) 68%, white); }
+  .evidence-checklist > div { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
+  .evidence-checklist > div strong { font-size: .76rem; }
+  .evidence-checklist > div span { color: var(--lesson-muted); font-size: .66rem; }
+  .evidence-checklist label { display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: start; color: var(--lesson-muted); font-size: .72rem; line-height: 1.45; cursor: pointer; }
+  .evidence-checklist input { margin-top: 2px; accent-color: var(--lesson-secondary); }
+  .hint-ladder { margin-top: 12px; display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; padding: 15px; border-radius: 11px; background: color-mix(in srgb, var(--lesson-accent) 8%, var(--lesson-surface)); }
+  .hint-ladder > div strong, .hint-ladder > div span { display: block; }
+  .hint-ladder > div strong { font-size: .76rem; }
+  .hint-ladder > div span { margin-top: 2px; color: var(--lesson-muted); font-size: .66rem; }
+  .hint-ladder button { align-self: start; padding: 7px 10px; border: 1px solid var(--lesson-border); border-radius: 999px; background: var(--lesson-surface); color: var(--lesson-primary); font-size: .67rem; font-weight: 760; cursor: pointer; }
+  .hint-ladder button:disabled { opacity: .45; cursor: not-allowed; }
+  .hint-ladder > p { grid-column: 1 / -1; margin: 0; padding: 9px 11px; border-radius: 8px; background: var(--lesson-surface); color: var(--lesson-muted); font-size: .72rem; line-height: 1.5; }
+  .hint-ladder > p b { display: inline-block; min-width: 52px; color: var(--lesson-secondary); text-transform: uppercase; font-size: .61rem; letter-spacing: .08em; }
   .locked-message, .unlock-message { display: flex; gap: 14px; align-items: center; padding: 16px 20px; border-radius: 13px; }
   .locked-message { border: 1px dashed var(--lesson-border); background: color-mix(in srgb, var(--lesson-background) 70%, transparent); }
   .locked-message > span, .unlock-message > span { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; }
@@ -263,6 +309,10 @@
   .exemplar-grid article { padding: 17px; border: 1px solid color-mix(in srgb, var(--lesson-surface) 16%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--lesson-surface) 7%, transparent); }
   .exemplar-grid b { color: var(--lesson-accent); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; }
   .exemplar-grid p { margin: 8px 0 0; color: color-mix(in srgb, var(--lesson-surface) 80%, transparent); font-size: .8rem; line-height: 1.55; }
+  .exemplar-reflection { grid-column: 1 / -1; display: grid; gap: 7px; padding-top: 16px; border-top: 1px solid color-mix(in srgb, var(--lesson-surface) 17%, transparent); }
+  .exemplar-reflection > span { color: var(--lesson-accent); font-size: .67rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .exemplar-reflection > p { margin: 0; color: color-mix(in srgb, var(--lesson-surface) 72%, transparent); font-size: .76rem; line-height: 1.5; }
+  .exemplar-reflection textarea { background: color-mix(in srgb, var(--lesson-surface) 95%, white); color: var(--lesson-text); }
   @media (max-width: 900px) {
     .sense-grid { grid-template-columns: 1fr; }
     .insight-grid { grid-template-columns: 1fr; }

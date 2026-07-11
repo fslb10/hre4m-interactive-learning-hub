@@ -1,0 +1,29 @@
+{
+  "name": "HRE4M Interactive Learning Hub",
+  "short_name": "HRE4M Hub",
+  "description": "Interactive Grade 12 Catholic Religion lessons for Scripture, exegesis, and the Four Senses.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f2e9",
+  "theme_color": "#18234d",
+  "orientation": "any",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "og.png",
+      "sizes": "1731x909",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "HRE4M Unit 2 Gospel Exegesis learning hub"
+    }
+  ]
+}
