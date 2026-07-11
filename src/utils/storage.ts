@@ -14,6 +14,7 @@ export type PassageResponse = {
   evidenceChecklist: string[];
   exemplarReflection: string;
   hintLevel: number;
+  mediaResponses: Record<string, string>;
 };
 
 export type LessonState = {
@@ -36,6 +37,7 @@ export const emptyPassageResponse = (): PassageResponse => ({
   evidenceChecklist: [],
   exemplarReflection: '',
   hintLevel: 0,
+  mediaResponses: {},
 });
 
 export const emptyLessonState = (): LessonState => ({

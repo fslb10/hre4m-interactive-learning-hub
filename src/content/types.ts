@@ -2,6 +2,108 @@ export type Difficulty = 'Starter' | 'Intermediate' | 'Challenge';
 
 export type SenseKey = 'literal' | 'allegorical' | 'moral' | 'anagogical';
 
+export type InstructionalPurpose =
+  | 'Activate prior knowledge'
+  | 'Establish historical context'
+  | 'Observe a symbol'
+  | 'Compare interpretations'
+  | 'Clarify Catholic teaching'
+  | 'Prompt textual evidence'
+  | 'Prepare for one of the Four Senses';
+
+export type MediaCredit = {
+  sourceName: string;
+  sourceUrl?: string;
+  creator: string;
+  licence: string;
+  licenceUrl?: string;
+  attribution: string;
+};
+
+export type MediaQuestion = {
+  id: string;
+  prompt: string;
+};
+
+export type TranscriptCue = {
+  startSeconds?: number;
+  endSeconds?: number;
+  text: string;
+};
+
+export type MediaTranscript = {
+  title?: string;
+  language: string;
+  cues: TranscriptCue[];
+};
+
+export type MediaCaptions = {
+  available: boolean;
+  language: string;
+  label: string;
+  url?: string;
+  hosting?: 'local' | 'external';
+};
+
+type BasePassageMedia = {
+  id: string;
+  title: string;
+  instructionalPurpose: InstructionalPurpose;
+  optional: boolean;
+  description?: string;
+  textAlternative: string;
+  beforeViewing?: MediaQuestion[];
+  afterViewing?: MediaQuestion[];
+  transcript?: MediaTranscript;
+  captions?: MediaCaptions;
+  credit: MediaCredit;
+};
+
+export type ImageHotspot = {
+  id: string;
+  xPercent: number;
+  yPercent: number;
+  label: string;
+  observation: string;
+};
+
+export type GuidedImageMedia = BasePassageMedia & {
+  type: 'image';
+  images: Array<{
+    id: string;
+    src: string;
+    hosting: 'local' | 'external';
+    alt: string;
+    width?: number;
+    height?: number;
+    caption?: string;
+    credit?: MediaCredit;
+  }>;
+  hotspots?: ImageHotspot[];
+  observationPrompts?: MediaQuestion[];
+};
+
+export type AudioGuideMedia = BasePassageMedia & {
+  type: 'audio';
+  audio: {
+    src: string;
+    hosting: 'local' | 'external';
+    mimeType: string;
+  };
+  reflectionPrompts?: MediaQuestion[];
+};
+
+export type YouTubeClipMedia = BasePassageMedia & {
+  type: 'youtube';
+  youtubeId: string;
+  startSeconds?: number;
+  endSeconds?: number;
+  captionLanguage?: string;
+  playlistId?: string;
+};
+
+export type PassageMedia = GuidedImageMedia | AudioGuideMedia | YouTubeClipMedia;
+
 export type ThemeColors = {
   background: string;
   surface: string;
@@ -35,6 +137,7 @@ export type GospelPassage = {
   teacherNote: string;
   prompts: PassagePrompts;
   exemplars: Record<SenseKey, string>;
+  media?: PassageMedia[];
 };
 
 export type QuizItem = {

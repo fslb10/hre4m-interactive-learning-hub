@@ -22,6 +22,8 @@
   } from '../utils/storage';
   import { buildStudentExport, exportFilename } from '../utils/exportText';
   import { completionSummary, getBadges, passageComplete } from '../utils/progress';
+  import { visiblePassageMedia } from '../utils/media';
+  import { grantTeacherAccess, hasTeacherAccess } from '../utils/teacherAccess';
   import ExegesisQuiz from './ExegesisQuiz.svelte';
   import BackupControls from './BackupControls.svelte';
   import FinalActivities from './FinalActivities.svelte';
@@ -44,6 +46,9 @@
   let view: View = 'overview';
   let activePassageId = '';
   let teacherMode = false;
+  let teacherPinOpen = false;
+  let teacherPin = '';
+  let teacherPinError = '';
   let sidebarOpen = false;
   let toast = '';
   let assignment: AssignmentConfig | null = null;
@@ -75,7 +80,12 @@
     ? {
         ...lesson,
         title: `${assignment.title} · Gospel of ${lesson.shortName}`,
-        passages: lesson.passages.filter((passage) => assignment?.passageIds.includes(passage.id)),
+        passages: lesson.passages
+          .filter((passage) => assignment?.passageIds.includes(passage.id))
+          .map((passage) => ({
+            ...passage,
+            media: visiblePassageMedia(passage.media, assignment.includeOptionalMedia),
+          })),
         quiz: assignment.requireQuiz ? lesson.quiz : [],
         sortingActivity: assignment.requireSorter ? lesson.sortingActivity : [],
         requirements: {
@@ -109,6 +119,33 @@
     toastTimer = setTimeout(() => (toast = ''), 2600);
   }
 
+  function toggleTeacherMode() {
+    if (teacherMode) {
+      teacherMode = false;
+      return;
+    }
+    if (hasTeacherAccess()) {
+      teacherMode = true;
+      return;
+    }
+    teacherPin = '';
+    teacherPinError = '';
+    teacherPinOpen = true;
+  }
+
+  function unlockTeacherMode() {
+    if (grantTeacherAccess(teacherPin)) {
+      teacherMode = true;
+      teacherPinOpen = false;
+      teacherPin = '';
+      teacherPinError = '';
+      notify('Teacher mode unlocked.');
+      return;
+    }
+    teacherPinError = 'Incorrect PIN. Please try again.';
+    teacherPin = '';
+  }
+
   function enterLesson(info: StudentInfo) {
     student = info;
     prefill = info;
@@ -124,7 +161,8 @@
   function commit(next: LessonState) {
     const hasWrittenWork =
       Object.values(state.responses).some((response) =>
-        [response.literal, response.allegorical, response.moral, response.anagogical, response.exit].some((value) => value.trim()),
+        [response.literal, response.allegorical, response.moral, response.anagogical, response.exit].some((value) => value.trim()) ||
+        Object.values(response.mediaResponses ?? {}).some((value) => value.trim()),
       ) ||
       Boolean(state.synthesis.trim()) ||
       Boolean(state.reflectionResponse.trim());
@@ -269,7 +307,7 @@
 
         {#if !assignment}<div class="teacher-toggle">
           <div><b>Teacher mode</b><small>Notes + unlocked fields</small></div>
-          <button class:on={teacherMode} on:click={() => (teacherMode = !teacherMode)} aria-pressed={teacherMode} aria-label="Toggle teacher mode"><span></span></button>
+          <button class:on={teacherMode} on:click={toggleTeacherMode} aria-pressed={teacherMode} aria-label="Toggle teacher mode"><span></span></button>
         </div>{/if}
       </aside>
 
@@ -387,6 +425,22 @@
     </div>
 
     {#if toast}<div class="toast" role="status">{toast}</div>{/if}
+    {#if teacherPinOpen}
+      <div class="teacher-pin-backdrop" role="presentation" on:click={() => (teacherPinOpen = false)}>
+        <section class="teacher-pin-dialog" role="dialog" aria-modal="true" aria-labelledby="teacher-pin-title" on:click|stopPropagation>
+          <button class="dialog-close" on:click={() => (teacherPinOpen = false)} aria-label="Close teacher PIN dialog">×</button>
+          <p>Restricted control</p>
+          <h2 id="teacher-pin-title">Unlock Teacher Mode</h2>
+          <span>Enter the four-digit teacher PIN to show notes and unlock passage fields.</span>
+          <form on:submit|preventDefault={unlockTeacherMode}>
+            <label for="lesson-teacher-pin">Teacher PIN</label>
+            <input id="lesson-teacher-pin" bind:value={teacherPin} type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" autofocus />
+            {#if teacherPinError}<small role="alert">{teacherPinError}</small>{/if}
+            <button type="submit" disabled={teacherPin.length !== 4}>Unlock</button>
+          </form>
+        </section>
+      </div>
+    {/if}
   {/if}
 </div>
 
@@ -489,6 +543,18 @@
   .data-controls button.danger { color: #9f3346; border-color: #d9a2ad; }
   .mobile-nav { display: none; }
   .toast { position: fixed; z-index: 100; right: 25px; bottom: 25px; padding: 13px 17px; border-radius: 11px; background: var(--lesson-primary); color: var(--lesson-surface); box-shadow: 0 16px 40px rgba(0,0,0,.22); font-size: .78rem; font-weight: 720; }
+  .teacher-pin-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; background: rgba(8,13,31,.7); backdrop-filter: blur(8px); }
+  .teacher-pin-dialog { width: min(430px, 100%); padding: 34px; border: 1px solid var(--lesson-border); border-radius: 20px; background: var(--lesson-surface); color: var(--lesson-text); box-shadow: 0 30px 90px rgba(0,0,0,.32); position: relative; }
+  .dialog-close { position: absolute; top: 12px; right: 14px; border: 0; background: none; color: var(--lesson-muted); font-size: 1.35rem; cursor: pointer; }
+  .teacher-pin-dialog > p { margin: 0 0 8px; color: var(--lesson-secondary); font-size: .62rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+  .teacher-pin-dialog h2 { margin: 0; font: 400 2rem Georgia, serif; }
+  .teacher-pin-dialog > span { display: block; margin: 10px 0 22px; color: var(--lesson-muted); font-size: .78rem; line-height: 1.55; }
+  .teacher-pin-dialog form { display: grid; gap: 9px; }
+  .teacher-pin-dialog label { color: var(--lesson-muted); font-size: .62rem; font-weight: 820; letter-spacing: .11em; text-transform: uppercase; }
+  .teacher-pin-dialog input { min-height: 52px; border: 1px solid var(--lesson-border); border-radius: 10px; background: var(--lesson-background); color: var(--lesson-text); font-size: 1.3rem; letter-spacing: .45em; text-align: center; }
+  .teacher-pin-dialog form small { color: #a12d43; font-size: .72rem; font-weight: 750; text-align: center; }
+  .teacher-pin-dialog form button { min-height: 46px; border: 0; border-radius: 10px; background: var(--lesson-primary); color: var(--lesson-surface); font-weight: 800; cursor: pointer; }
+  .teacher-pin-dialog form button:disabled { opacity: .4; cursor: not-allowed; }
   @media (max-width: 1040px) {
     .app-shell { grid-template-columns: 1fr; }
     .sidebar { position: fixed; left: 0; top: 0; width: min(300px, 86vw); transform: translateX(-105%); transition: transform .25s ease; box-shadow: 20px 0 60px rgba(0,0,0,.2); }

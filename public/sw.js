@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hre4m-hub-v2';
+const CACHE_NAME = 'hre4m-hub-v3';
 const APP_ROUTES = [
   './',
   './teacher/',
@@ -10,6 +10,7 @@ const APP_ROUTES = [
   './manifest.webmanifest',
   './app-icon.png',
   './og.png',
+  './media/cana-jars-observation.svg',
 ];
 
 self.addEventListener('install', (event) => {

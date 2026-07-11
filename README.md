@@ -19,6 +19,8 @@ A static, classroom-ready learning hub for Grade 12 Catholic Religion. The curre
 - evidence checklists, layered hints, and exemplar-comparison reflection
 - installable PWA support with offline access to visited lessons
 - automated GitHub Pages route checks and critical student-flow tests
+- structured, credited passage media with guided checkpoints and offline text alternatives
+- privacy-enhanced, click-to-load YouTube clips with timestamps, captions, transcripts, and direct-link fallback
 - static GitHub Pages deployment
 
 The app intentionally provides references, short teacher-created anchor lines, and contextual prompts rather than reproducing full NRSV / NRSV-CE passages. Students use a physical or approved digital Bible alongside the app.
@@ -52,7 +54,9 @@ npm run test:logic
 
 ## Teacher Assignment Mode
 
-Open `/teacher/` from the **Teacher tools** link on the homepage. Choose a Gospel, required passages, due date, class period, and required activities. The builder produces one student link containing the assignment settings.
+Open `/teacher/` from the **Teacher tools** link on the homepage and enter the classroom teacher PIN. Access remains unlocked for the current browser tab. Choose a Gospel, required passages, due date, class period, required activities, and whether optional passage media should appear. The builder produces one student link containing the assignment settings.
+
+Teacher Mode inside each Gospel lesson uses the same PIN gate before showing notes or unlocking student fields. This is a lightweight classroom deterrent for the public GitHub Pages site, not server-backed authentication.
 
 Assignment links do not contain student names or responses. Student work remains in browser storage until the student downloads a backup, text export, or PDF.
 
@@ -88,6 +92,44 @@ Add a `definePassage({ ... })` entry to the relevant Gospel file. Each passage n
 - concise exemplars for the literal, allegorical, moral, and anagogical senses
 
 The shared prompts are applied automatically and can be overridden per passage when needed.
+
+## Author passage media
+
+Media belongs in a passage's `media` array in `src/content/lessons/*.ts`; do not hard-code media URLs in page components. The union types in `src/content/types.ts` support `image`, `audio`, and `youtube` items. Every item must include:
+
+- a stable `id`, `title`, `type`, and `optional` setting
+- one defined `instructionalPurpose` from the approved purpose list
+- a meaningful `textAlternative` that still supports the lesson if media cannot load
+- `credit` with source, creator, licence, and a ready-to-display attribution line
+- optional `beforeViewing` and `afterViewing` question arrays with stable question ids
+
+The reusable renderer uses `MediaCard`, `GuidedImage`, `AudioGuide`, `YouTubeClip`, `MediaCheckpoint`, `TranscriptPanel`, and `SourceCredit`. Checkpoint answers are keyed by media and question id and are included in the existing local autosave, recovery snapshot, and portable backup.
+
+### Image and gallery fields
+
+Each image needs `src`, `hosting` (`local` or `external`), and descriptive `alt`. Add `width` and `height` to prevent layout shift. Multiple entries create a keyboard-accessible gallery. `hotspots` use percentage coordinates and must have a concise `label` plus an `observation`; important information must also remain available through the image alt, caption, prompts, or text alternative.
+
+Store local media under `public/media/` and author its `src` without a leading slash, for example `media/cana-jars-observation.svg`. The renderer adds Astro's deployment base path so assets work on project GitHub Pages. Add intentionally offline-critical local files to `APP_ROUTES` in `public/sw.js` and to `scripts/verify-build.mjs`.
+
+### Audio fields
+
+Audio items use an `audio` object with `src`, `hosting`, and `mimeType`. Browsers receive a native, keyboard-accessible player with `preload="metadata"` and no autoplay. Add `reflectionPrompts`, a cue-based `transcript`, and caption metadata when available; caption files may also declare `hosting` as `local` or `external`. A transcript is required in practice for spoken instructional content even though the type remains optional for media without speech.
+
+### YouTube fields
+
+Author only the 11-character `youtubeId`, not an embed URL. Optional fields include `startSeconds`, `endSeconds`, `captionLanguage`, and `playlistId`. The shared component:
+
+- connects only after the student chooses **Load video**
+- embeds through `youtube-nocookie.com`
+- sets autoplay off and requests captions on by default
+- keeps the player responsive and keyboard accessible
+- always displays a timestamped direct YouTube link for school-network embed failures
+
+Add a transcript whenever the video supplies one and record caption availability honestly. Do not put required learning only inside a video; the `textAlternative` and surrounding prompts must preserve the route through the activity.
+
+### Demonstration item
+
+`john-2-cana` contains one optional guided-image demonstration using the locally hosted, CC BY 4.0 “Six Stone Jars” schematic. It exercises observation hotspots, before/after questions, saved media notes, attribution, deployment-safe paths, and offline precaching without populating the other passages.
 
 ## Add a future unit
 

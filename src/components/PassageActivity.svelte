@@ -2,6 +2,7 @@
   import type { GospelPassage, SenseKey } from '../content/types';
   import type { PassageResponse } from '../utils/storage';
   import { EXIT_MIN, LITERAL_MIN, SENSE_MIN } from '../utils/progress';
+  import PassageMedia from './PassageMedia.svelte';
 
   export let passage: GospelPassage;
   export let response: PassageResponse;
@@ -43,6 +44,10 @@
   function toggleEvidence(id: string) {
     const current = response.evidenceChecklist ?? [];
     update('evidenceChecklist', current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  }
+
+  function updateMediaResponse(key: string, value: string) {
+    update('mediaResponses', { ...(response.mediaResponses ?? {}), [key]: value });
   }
 
   function requestExemplar() {
@@ -112,6 +117,12 @@
   {#if teacherMode}
     <aside class="teacher-note"><b>Teacher note</b><span>{passage.teacherNote}</span></aside>
   {/if}
+
+  <PassageMedia
+    media={passage.media ?? []}
+    responses={response.mediaResponses ?? {}}
+    onResponse={updateMediaResponse}
+  />
 
   <section class="response-lab" aria-labelledby="response-title">
     <div class="response-heading">

@@ -17,6 +17,7 @@
   let requireReflection = true;
   let allowExemplars = true;
   let requireUnlock = true;
+  let includeOptionalMedia = true;
   let origin = '';
   let copied = false;
   let previousSlug = selectedSlug;
@@ -38,6 +39,7 @@
     requireReflection,
     allowExemplars,
     requireUnlock,
+    includeOptionalMedia,
   } satisfies AssignmentConfig;
   $: assignmentPath = `${base}unit-2/${lesson.shortName.toLowerCase()}/?${assignmentSearch(config)}`;
   $: assignmentUrl = origin ? `${origin}${assignmentPath}` : assignmentPath;
@@ -109,6 +111,7 @@
           <label><input type="checkbox" bind:checked={requireReflection} /><span><strong>Choice-board reflection</strong><small>Require one reflection route</small></span></label>
           <label><input type="checkbox" bind:checked={allowExemplars} /><span><strong>Student exemplars</strong><small>Allow models after an attempt</small></span></label>
           <label><input type="checkbox" bind:checked={requireUnlock} /><span><strong>Literal-first unlock</strong><small>Ground deeper senses in context</small></span></label>
+          <label><input type="checkbox" bind:checked={includeOptionalMedia} /><span><strong>Optional passage media</strong><small>Include optional images, audio, and video</small></span></label>
         </div>
       </section>
 
