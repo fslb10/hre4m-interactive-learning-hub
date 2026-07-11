@@ -21,8 +21,17 @@ for (const route of [
   'manifest.webmanifest',
   'sw.js',
   'app-icon.png',
+  'media/cana-jars-observation.svg',
 ]) {
   requireFile(route);
+}
+
+const serviceWorkerPath = join(dist, 'sw.js');
+if (existsSync(serviceWorkerPath)) {
+  const serviceWorker = readFileSync(serviceWorkerPath, 'utf8');
+  if (!serviceWorker.includes("'./media/cana-jars-observation.svg'")) {
+    failures.push('The demonstration media asset is not included in the offline app shell.');
+  }
 }
 
 const homePath = join(dist, 'index.html');
@@ -33,13 +42,20 @@ if (existsSync(homePath)) {
 
   for (const link of links) {
     if (!link.startsWith(`${base}unit-2/`)) failures.push(`Incorrect Gospel base path: ${link}`);
-    if (link.includes(`${repository}unit-2`)) failures.push(`Missing slash in Gospel path: ${link}`);
+    if (repository && link.includes(`${repository}unit-2`)) failures.push(`Missing slash in Gospel path: ${link}`);
     const relative = link.slice(base.length).replace(/^\//, '');
     requireFile(join(relative, 'index.html'), `page targeted by ${link}`);
   }
 
   if (!html.includes(`href="${base}teacher/"`)) failures.push('Teacher tools link does not use the deployment base path.');
   if (!html.includes(`href="${base}manifest.webmanifest"`)) failures.push('Manifest link does not use the deployment base path.');
+}
+
+const teacherPath = join(dist, 'teacher/index.html');
+if (existsSync(teacherPath)) {
+  const html = readFileSync(teacherPath, 'utf8');
+  if (!html.includes('Enter the four-digit teacher PIN')) failures.push('Teacher Tools does not render the PIN gate.');
+  if (!html.includes('Access remains unlocked only in this browser tab.')) failures.push('Teacher Tools is missing its session-access notice.');
 }
 
 const manifestPath = join(dist, 'manifest.webmanifest');

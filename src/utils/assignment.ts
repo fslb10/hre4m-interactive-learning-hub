@@ -12,6 +12,7 @@ export type AssignmentConfig = {
   requireReflection: boolean;
   allowExemplars: boolean;
   requireUnlock: boolean;
+  includeOptionalMedia: boolean;
 };
 
 const boolParam = (params: URLSearchParams, key: string, fallback: boolean) => {
@@ -43,6 +44,7 @@ export function parseAssignment(search: string, lesson: GospelLesson): Assignmen
     requireReflection: boolParam(params, 'reflection', true),
     allowExemplars: boolParam(params, 'exemplars', true),
     requireUnlock: boolParam(params, 'unlock', true),
+    includeOptionalMedia: boolParam(params, 'media', true),
   };
 }
 
@@ -57,6 +59,7 @@ export function assignmentSearch(config: AssignmentConfig): string {
     reflection: config.requireReflection ? '1' : '0',
     exemplars: config.allowExemplars ? '1' : '0',
     unlock: config.requireUnlock ? '1' : '0',
+    media: config.includeOptionalMedia ? '1' : '0',
   });
 
   if (config.dueDate) params.set('due', config.dueDate);
@@ -70,5 +73,6 @@ export function assignmentRequirements(config: AssignmentConfig): string[] {
   if (config.requireSorter) requirements.push('Four Senses sorter');
   if (config.requireSynthesis) requirements.push('Mini-exegesis');
   if (config.requireReflection) requirements.push('Choice-board reflection');
+  if (config.includeOptionalMedia) requirements.push('Optional media included');
   return requirements;
 }

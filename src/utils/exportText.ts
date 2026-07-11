@@ -1,6 +1,7 @@
 import type { GospelLesson } from '../content/types';
 import type { LessonState, StudentInfo } from './storage';
 import { completionSummary } from './progress';
+import { mediaResponseEntries } from './media';
 
 const heading = (value: string) => `\n${value.toUpperCase()}\n${'—'.repeat(Math.min(value.length, 60))}`;
 
@@ -18,8 +19,21 @@ export function buildStudentExport(lesson: GospelLesson, student: StudentInfo, s
 
   for (const passage of lesson.passages) {
     const response = state.responses[passage.id];
-    if (!response || !Object.values(response).some(Boolean)) continue;
+    if (!response) continue;
+    const mediaEntries = mediaResponseEntries(passage.media, response.mediaResponses ?? {});
+    const hasWrittenResponse = [
+      response.literal,
+      response.allegorical,
+      response.moral,
+      response.anagogical,
+      response.exit,
+      response.exemplarReflection,
+    ].some((value) => value.trim()) || mediaEntries.length > 0;
+    if (!hasWrittenResponse) continue;
     lines.push(heading(`${passage.reference} — ${passage.title}`));
+    for (const entry of mediaEntries) {
+      lines.push(`\nMedia Checkpoint · ${entry.mediaTitle}\n${entry.stage}: ${entry.prompt}\n${entry.response}`);
+    }
     if (response.literal.trim()) lines.push(`\nLiteral / Context\n${response.literal.trim()}`);
     if (response.allegorical.trim()) lines.push(`\nAllegorical\n${response.allegorical.trim()}`);
     if (response.moral.trim()) lines.push(`\nMoral\n${response.moral.trim()}`);

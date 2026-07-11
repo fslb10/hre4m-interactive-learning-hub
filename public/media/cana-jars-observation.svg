@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title description">
+  <title id="title">Six stone jars arranged for an observation activity</title>
+  <description id="description">A classroom illustration of six differently sized stone jars on a warm neutral background, with water lines and a subtle wedding-table motif.</description>
+  <rect width="1200" height="675" fill="#f3ecdc"/>
+  <path d="M0 505 C250 465 420 540 650 495 C860 455 1010 520 1200 480 V675 H0Z" fill="#d7c5a3"/>
+  <path d="M120 160 H1080" stroke="#b98949" stroke-width="4" stroke-dasharray="10 18" opacity=".55"/>
+  <g fill="#8b8272" stroke="#514d49" stroke-width="8">
+    <path d="M132 254 Q155 225 205 225 Q255 225 278 254 L262 285 Q294 335 275 490 Q205 535 135 490 Q116 335 148 285Z"/>
+    <path d="M315 224 Q340 190 394 190 Q448 190 473 224 L455 258 Q490 318 468 500 Q394 548 320 500 Q298 318 333 258Z"/>
+    <path d="M510 270 Q530 245 575 245 Q620 245 640 270 L625 298 Q655 350 637 493 Q575 532 513 493 Q495 350 525 298Z"/>
+    <path d="M677 239 Q701 207 753 207 Q805 207 829 239 L812 271 Q845 328 824 503 Q753 548 682 503 Q661 328 694 271Z"/>
+    <path d="M873 281 Q892 257 935 257 Q978 257 997 281 L983 307 Q1011 355 994 489 Q935 526 876 489 Q859 355 887 307Z"/>
+    <path d="M1000 238 Q1022 210 1070 210 Q1118 210 1140 238 L1124 268 Q1155 322 1136 482 Q1070 524 1004 482 Q985 322 1016 268Z"/>
+  </g>
+  <g fill="none" stroke="#b8d4d8" stroke-width="10" opacity=".9">
+    <path d="M145 354 Q205 375 265 354"/><path d="M319 330 Q394 354 469 330"/>
+    <path d="M512 370 Q575 390 638 370"/><path d="M680 345 Q753 368 826 345"/>
+    <path d="M875 380 Q935 399 995 380"/><path d="M1003 338 Q1070 360 1137 338"/>
+  </g>
+  <g fill="#f8f1df" font-family="Georgia, serif" font-size="34" text-anchor="middle">
+    <text x="205" y="450">1</text><text x="394" y="450">2</text><text x="575" y="450">3</text>
+    <text x="753" y="450">4</text><text x="935" y="450">5</text><text x="1070" y="450">6</text>
+  </g>
+  <text x="600" y="105" fill="#18234d" font-family="Georgia, serif" font-size="48" text-anchor="middle">Observe before you interpret</text>
+  <text x="600" y="585" fill="#514d49" font-family="Arial, sans-serif" font-size="25" text-anchor="middle">Number • material • capacity • transformation</text>
+</svg>

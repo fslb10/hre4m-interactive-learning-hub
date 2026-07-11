@@ -2,6 +2,7 @@
   import type { GospelLesson } from '../content/types';
   import type { LessonState, StudentInfo } from '../utils/storage';
   import { completionSummary } from '../utils/progress';
+  import { mediaResponseEntries } from '../utils/media';
 
   export let lesson: GospelLesson;
   export let student: StudentInfo;
@@ -12,7 +13,8 @@
 
   $: summary = completionSummary(lesson, state);
   $: completedResponseCount = Object.values(state.responses).filter((response) =>
-    [response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim()),
+    [response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim()) ||
+    Object.values(response.mediaResponses ?? {}).some((value) => value.trim()),
   ).length;
 </script>
 
@@ -52,10 +54,14 @@
 
     {#each lesson.passages as passage}
       {@const response = state.responses[passage.id]}
-      {#if response && [response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim())}
+      {@const mediaEntries = response ? mediaResponseEntries(passage.media, response.mediaResponses ?? {}) : []}
+      {#if response && ([response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim()) || mediaEntries.length)}
         <section class="report-section">
           <div class="report-title"><span>{passage.reference}</span><h2>{passage.title}</h2></div>
           <div class="report-responses">
+            {#each mediaEntries as entry}
+              <div><b>Media · {entry.mediaTitle} · {entry.stage}</b><p><strong>{entry.prompt}</strong><br />{entry.response}</p></div>
+            {/each}
             {#each [
               ['Literal / Context', response.literal],
               ['Allegorical', response.allegorical],

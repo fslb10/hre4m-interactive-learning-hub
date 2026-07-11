@@ -75,6 +75,78 @@ export const johnLesson: GospelLesson = {
         'Avoid reducing this to a story about Jesus helping a party continue. John asks readers to see what the sign reveals about Jesus and the new covenant.',
       teacherNote:
         'Have students distinguish the visible action from the invisible reality the sign points toward.',
+      media: [
+        {
+          id: 'cana-six-jars-observation',
+          type: 'image',
+          title: 'Six Stone Jars: Observation Study',
+          instructionalPurpose: 'Observe a symbol',
+          optional: true,
+          description:
+            'Use this original schematic illustration to slow down and notice the scale and symbolism of the jars before interpreting the sign.',
+          textAlternative:
+            'Imagine six large stone water jars arranged together. John identifies them with Jewish purification and says that each holds a substantial amount. The repeated number, material, capacity, and transformation are the key observations.',
+          beforeViewing: [
+            {
+              id: 'prediction',
+              prompt: 'Without interpreting yet, what details about the jars does John 2:6 ask you to notice?',
+            },
+          ],
+          images: [
+            {
+              id: 'six-jars',
+              src: 'media/cana-jars-observation.svg',
+              hosting: 'local',
+              alt: 'Schematic illustration of six numbered stone jars with visible water lines, arranged from left to right.',
+              width: 1200,
+              height: 675,
+              caption: 'A text-study aid, not an archaeological reconstruction of the Cana vessels.',
+            },
+          ],
+          hotspots: [
+            {
+              id: 'six-together',
+              xPercent: 49,
+              yPercent: 45,
+              label: 'Six jars together',
+              observation: 'John specifies six vessels rather than describing an unspecified supply of water.',
+            },
+            {
+              id: 'stone-material',
+              xPercent: 18,
+              yPercent: 59,
+              label: 'Stone material',
+              observation: 'The material connects the vessels with practices of ritual purification.',
+            },
+            {
+              id: 'large-capacity',
+              xPercent: 80,
+              yPercent: 58,
+              label: 'Large capacity',
+              observation: 'The scale helps the reader notice abundance, not merely a small private solution.',
+            },
+          ],
+          observationPrompts: [
+            {
+              id: 'strongest-detail',
+              prompt: 'Which visualized detail—number, material, capacity, or water—most needs textual investigation? Why?',
+            },
+          ],
+          afterViewing: [
+            {
+              id: 'textual-evidence',
+              prompt: 'Return to John 2:6–11. Cite one detail that could support an allegorical reading without skipping the literal sense.',
+            },
+          ],
+          credit: {
+            sourceName: 'HRE4M Interactive Learning Hub local media library',
+            creator: 'HRE4M Interactive Learning Hub',
+            licence: 'CC BY 4.0',
+            licenceUrl: 'https://creativecommons.org/licenses/by/4.0/',
+            attribution: '“Six Stone Jars: Observation Study,” HRE4M Interactive Learning Hub, CC BY 4.0.',
+          },
+        },
+      ],
       exemplars: {
         literal:
           'At a wedding where the wine has run out, Mary brings the need to Jesus. He directs servants to fill purification jars with water, which becomes excellent wine, and his disciples begin to believe in him.',
