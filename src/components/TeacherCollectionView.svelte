@@ -12,7 +12,7 @@
 
   $: summary = completionSummary(lesson, state);
   $: completedResponseCount = Object.values(state.responses).filter((response) =>
-    [response.literal, response.allegorical, response.moral, response.anagogical, response.exit].some((value) => value.trim()),
+    [response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim()),
   ).length;
 </script>
 
@@ -52,7 +52,7 @@
 
     {#each lesson.passages as passage}
       {@const response = state.responses[passage.id]}
-      {#if response && [response.literal, response.allegorical, response.moral, response.anagogical, response.exit].some((value) => value.trim())}
+      {#if response && [response.literal, response.allegorical, response.moral, response.anagogical, response.exit, response.exemplarReflection].some((value) => value.trim())}
         <section class="report-section">
           <div class="report-title"><span>{passage.reference}</span><h2>{passage.title}</h2></div>
           <div class="report-responses">
@@ -62,6 +62,7 @@
               ['Moral', response.moral],
               ['Anagogical', response.anagogical],
               ['Exit Check', response.exit],
+              ['Exemplar Comparison', response.exemplarReflection],
             ] as field}
               {#if field[1].trim()}<div><b>{field[0]}</b><p>{field[1]}</p></div>{/if}
             {/each}

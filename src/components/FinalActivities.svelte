@@ -3,6 +3,8 @@
   export let synthesis = '';
   export let reflectionChoice = '';
   export let reflectionResponse = '';
+  export let showSynthesis = true;
+  export let showReflection = true;
   export let onSynthesis: (value: string) => void;
   export let onReflectionChoice: (value: string) => void;
   export let onReflectionResponse: (value: string) => void;
@@ -20,7 +22,7 @@
 </script>
 
 <div class="final-shell">
-  <section class="synthesis" aria-labelledby="synthesis-title">
+  {#if showSynthesis}<section class="synthesis" aria-labelledby="synthesis-title">
     <div class="section-intro">
       <p>Final task 01</p>
       <h2 id="synthesis-title">Write a mini-exegesis</h2>
@@ -45,9 +47,9 @@
       <textarea value={synthesis} on:input={(event) => onSynthesis(event.currentTarget.value)} rows="11" placeholder="Build your mini-exegesis here…"></textarea>
       <small class:ready={synthesis.trim().length >= 180}>{synthesis.trim().length} characters {synthesis.trim().length >= 180 ? '· synthesis complete' : '· aim for at least 180'}</small>
     </label>
-  </section>
+  </section>{/if}
 
-  <section class="choice-board" aria-labelledby="choice-title">
+  {#if showReflection}<section class="choice-board" aria-labelledby="choice-title">
     <div class="section-intro">
       <p>Final task 02</p>
       <h2 id="choice-title">Choose your reflection route</h2>
@@ -68,7 +70,7 @@
         <small class:ready={reflectionResponse.trim().length >= 100}>{reflectionResponse.trim().length} characters {reflectionResponse.trim().length >= 100 ? '· reflection complete' : '· aim for at least 100'}</small>
       </label>
     {/if}
-  </section>
+  </section>{/if}
 </div>
 
 <style>

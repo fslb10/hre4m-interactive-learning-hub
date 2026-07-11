@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TeacherAssignmentBuilder from '../components/TeacherAssignmentBuilder.svelte';
+import { gospelLessons } from '../content/lessons';
+
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+---
+
+<BaseLayout
+  title="Teacher Assignment Builder · HRE4M Learning Hub"
+  description="Create a focused, shareable Unit 2 Gospel assignment for HRE4M students."
+  className="teacher-builder-page"
+>
+  <TeacherAssignmentBuilder client:load lessons={gospelLessons} {base} />
+</BaseLayout>

@@ -14,6 +14,11 @@ A static, classroom-ready learning hub for Grade 12 Catholic Religion. The curre
 - exegesis/eisegesis checks and a click-based Four Senses sorter
 - badges, progress tracking, synthesis, and reflection choice board
 - clean teacher collection view, copy, text export, and print/PDF support
+- shareable Teacher Assignment Mode with passage and activity requirements
+- portable JSON backup/import plus rolling recovery snapshots
+- evidence checklists, layered hints, and exemplar-comparison reflection
+- installable PWA support with offline access to visited lessons
+- automated GitHub Pages route checks and critical student-flow tests
 - static GitHub Pages deployment
 
 The app intentionally provides references, short teacher-created anchor lines, and contextual prompts rather than reproducing full NRSV / NRSV-CE passages. Students use a physical or approved digital Bible alongside the app.
@@ -32,6 +37,24 @@ Create a production build with:
 ```sh
 npm run build
 ```
+
+Verify the generated GitHub Pages routes with:
+
+```sh
+npm run verify:build
+```
+
+Run the automated assignment, progression, migration, and backup tests with:
+
+```sh
+npm run test:logic
+```
+
+## Teacher Assignment Mode
+
+Open `/teacher/` from the **Teacher tools** link on the homepage. Choose a Gospel, required passages, due date, class period, and required activities. The builder produces one student link containing the assignment settings.
+
+Assignment links do not contain student names or responses. Student work remains in browser storage until the student downloads a backup, text export, or PDF.
 
 ## GitHub Pages
 
@@ -80,4 +103,4 @@ Recommended next steps:
 
 ## Local data and privacy
 
-There is no backend and no real authentication. Names, periods, and responses are stored only in browser LocalStorage using a lesson-and-student-specific key. Students should export or print completed work before clearing browser data or switching devices.
+There is no backend and no real authentication. Names, periods, and responses are stored only in browser LocalStorage using a lesson-and-student-specific key. Students can download a portable `.hre4m.json` backup and import it on another device. The hub also keeps a rolling recovery snapshot before destructive changes and at intervals during writing.

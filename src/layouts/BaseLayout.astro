@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PwaControls from '../components/PwaControls.svelte';
 
 type Props = {
   title: string;
@@ -23,6 +24,9 @@ const ogImage = Astro.site ? new URL(`${base}og.png`, Astro.site) : null;
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonical} />
+    <link rel="manifest" href={`${base}manifest.webmanifest`} />
+    <link rel="icon" type="image/png" href={`${base}app-icon.png`} />
+    <link rel="apple-touch-icon" href={`${base}app-icon.png`} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -38,5 +42,6 @@ const ogImage = Astro.site ? new URL(`${base}og.png`, Astro.site) : null;
   <body class={className}>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <slot />
+    <PwaControls client:load {base} />
   </body>
 </html>

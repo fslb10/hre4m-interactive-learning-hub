@@ -1,15 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { GospelLesson } from '../content/types';
+  import { assignmentRequirements, parseAssignment, type AssignmentConfig } from '../utils/assignment';
   import {
+    clearRecoverySnapshot,
     clearLastStudent,
     clearLessonState,
+    createLessonBackup,
     emptyLessonState,
     emptyPassageResponse,
     loadLastStudent,
     loadLessonState,
+    loadRecoverySnapshot,
+    parseLessonBackup,
     saveLastStudent,
     saveLessonState,
+    saveRecoverySnapshot,
     type LessonState,
     type PassageResponse,
     type StudentInfo,
@@ -17,6 +23,7 @@
   import { buildStudentExport, exportFilename } from '../utils/exportText';
   import { completionSummary, getBadges, passageComplete } from '../utils/progress';
   import ExegesisQuiz from './ExegesisQuiz.svelte';
+  import BackupControls from './BackupControls.svelte';
   import FinalActivities from './FinalActivities.svelte';
   import FourSensesSorter from './FourSensesSorter.svelte';
   import LoginScreen from './LoginScreen.svelte';
@@ -39,7 +46,10 @@
   let teacherMode = false;
   let sidebarOpen = false;
   let toast = '';
+  let assignment: AssignmentConfig | null = null;
+  let hasRecovery = false;
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
+  let lastRecoveryAt = 0;
 
   const navItems: Array<{ id: View; icon: string; label: string; short: string }> = [
     { id: 'overview', icon: '⌂', label: 'Gospel lens', short: 'Lens' },
@@ -61,14 +71,36 @@
     `--lesson-border:${lesson.theme.colors.border}`,
   ].join(';');
 
-  $: summary = completionSummary(lesson, state);
-  $: badges = getBadges(lesson, state, loggedIn);
-  $: activePassage = lesson.passages.find((passage) => passage.id === activePassageId);
-  $: nextPassage = lesson.passages.find((passage) => !passageComplete(state.responses[passage.id])) ?? lesson.passages[0];
+  $: effectiveLesson = assignment
+    ? {
+        ...lesson,
+        title: `${assignment.title} · Gospel of ${lesson.shortName}`,
+        passages: lesson.passages.filter((passage) => assignment?.passageIds.includes(passage.id)),
+        quiz: assignment.requireQuiz ? lesson.quiz : [],
+        sortingActivity: assignment.requireSorter ? lesson.sortingActivity : [],
+        requirements: {
+          synthesis: assignment.requireSynthesis,
+          reflection: assignment.requireReflection,
+        },
+      }
+    : lesson;
+  $: visibleNavItems = navItems.filter((item) => {
+    if (!assignment) return true;
+    if (item.id === 'quiz') return assignment.requireQuiz;
+    if (item.id === 'sorter') return assignment.requireSorter;
+    if (item.id === 'synthesis') return assignment.requireSynthesis || assignment.requireReflection;
+    return true;
+  });
+  $: summary = completionSummary(effectiveLesson, state);
+  $: badges = getBadges(effectiveLesson, state, loggedIn);
+  $: activePassage = effectiveLesson.passages.find((passage) => passage.id === activePassageId);
+  $: nextPassage = effectiveLesson.passages.find((passage) => !passageComplete(state.responses[passage.id])) ?? effectiveLesson.passages[0];
 
   onMount(() => {
+    assignment = parseAssignment(window.location.search, lesson);
     const previous = loadLastStudent();
     if (previous) prefill = previous;
+    if (assignment?.period) prefill = { ...prefill, period: assignment.period };
   });
 
   function notify(message: string) {
@@ -82,12 +114,25 @@
     prefill = info;
     saveLastStudent(info);
     state = loadLessonState(lesson.id, info);
+    hasRecovery = Boolean(loadRecoverySnapshot(lesson.id, info));
+    lastRecoveryAt = Date.now();
     loggedIn = true;
     view = 'overview';
     activePassageId = '';
   }
 
   function commit(next: LessonState) {
+    const hasWrittenWork =
+      Object.values(state.responses).some((response) =>
+        [response.literal, response.allegorical, response.moral, response.anagogical, response.exit].some((value) => value.trim()),
+      ) ||
+      Boolean(state.synthesis.trim()) ||
+      Boolean(state.reflectionResponse.trim());
+    if (hasWrittenWork && Date.now() - lastRecoveryAt >= 60_000) {
+      saveRecoverySnapshot(lesson.id, student, state);
+      hasRecovery = true;
+      lastRecoveryAt = Date.now();
+    }
     state = { ...next, updatedAt: new Date().toISOString() };
     if (loggedIn) saveLessonState(lesson.id, student, state);
   }
@@ -110,12 +155,12 @@
   }
 
   function downloadWork() {
-    const text = buildStudentExport(lesson, student, state);
+    const text = buildStudentExport(effectiveLesson, student, state);
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = exportFilename(lesson, student);
+    link.download = exportFilename(effectiveLesson, student);
     link.click();
     URL.revokeObjectURL(url);
     notify('Student work exported.');
@@ -123,25 +168,65 @@
 
   async function copyWork() {
     try {
-      await navigator.clipboard.writeText(buildStudentExport(lesson, student, state));
+      await navigator.clipboard.writeText(buildStudentExport(effectiveLesson, student, state));
       notify('All completed work copied.');
     } catch {
       notify('Copy was blocked. Use Export .txt instead.');
     }
   }
 
+  function downloadBackup() {
+    const payload = createLessonBackup(lesson.id, student, state);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = exportFilename(lesson, student).replace('.txt', '.hre4m.json');
+    link.click();
+    URL.revokeObjectURL(url);
+    notify('Portable backup downloaded.');
+  }
+
+  async function importBackup(file: File) {
+    try {
+      const backup = parseLessonBackup(JSON.parse(await file.text()) as unknown, lesson.id);
+      saveRecoverySnapshot(lesson.id, student, state);
+      state = backup.state;
+      saveLessonState(lesson.id, student, backup.state);
+      hasRecovery = true;
+      view = 'overview';
+      activePassageId = '';
+      notify('Backup imported. Your previous version is recoverable.');
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'The backup could not be imported.');
+    }
+  }
+
+  function restoreRecovery() {
+    const snapshot = loadRecoverySnapshot(lesson.id, student);
+    if (!snapshot) return;
+    if (!window.confirm('Replace the current work with the recovery snapshot?')) return;
+    commit(snapshot);
+    clearRecoverySnapshot(lesson.id, student);
+    hasRecovery = false;
+    notify('Recovery snapshot restored.');
+  }
+
   function resetResponses() {
     if (!window.confirm(`Clear all saved ${lesson.shortName} responses for ${student.firstName}? This cannot be undone.`)) return;
+    saveRecoverySnapshot(lesson.id, student, state);
     clearLessonState(lesson.id, student);
     state = emptyLessonState();
     activePassageId = '';
     view = 'overview';
+    hasRecovery = true;
     notify('Lesson responses cleared.');
   }
 
   function clearEverything() {
     if (!window.confirm('Clear this lesson and the saved student information on this browser?')) return;
     clearLessonState(lesson.id, student);
+    clearRecoverySnapshot(lesson.id, student);
     clearLastStudent();
     state = emptyLessonState();
     student = { lastName: '', firstName: '', period: '' };
@@ -169,7 +254,7 @@
         </div>
 
         <nav aria-label="Lesson sections">
-          {#each navItems as item}
+          {#each visibleNavItems as item}
             <button class:active={view === item.id} on:click={() => navigate(item.id)}>
               <span aria-hidden="true">{item.icon}</span>{item.label}
             </button>
@@ -179,13 +264,13 @@
         <div class="side-progress">
           <div class="progress-label"><span>Overall progress</span><b>{summary.percentage}%</b></div>
           <div class="progress-track"><span style={`width:${summary.percentage}%`}></span></div>
-          <small>{summary.fullPassages}/{lesson.passages.length} full passages · autosaved locally</small>
+          <small>{summary.fullPassages}/{effectiveLesson.passages.length} full passages · autosaved locally</small>
         </div>
 
-        <div class="teacher-toggle">
+        {#if !assignment}<div class="teacher-toggle">
           <div><b>Teacher mode</b><small>Notes + unlocked fields</small></div>
           <button class:on={teacherMode} on:click={() => (teacherMode = !teacherMode)} aria-pressed={teacherMode} aria-label="Toggle teacher mode"><span></span></button>
-        </div>
+        </div>{/if}
       </aside>
 
       {#if sidebarOpen}<button class="scrim" on:click={() => (sidebarOpen = false)} aria-label="Close lesson menu"></button>{/if}
@@ -194,6 +279,7 @@
         <header class="topbar">
           <button class="menu-button" on:click={() => (sidebarOpen = true)} aria-label="Open lesson menu">☰</button>
           <div class="crumb"><a href={homeHref}>Learning Hub</a><span>/</span><b>Unit 2 · {lesson.shortName}</b></div>
+          <span class="save-status">✓ Saved {new Date(state.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
           <div class="student-menu">
             <span class="student-avatar">{student.firstName.charAt(0)}{student.lastName.charAt(0)}</span>
             <span><strong>{student.firstName} {student.lastName}</strong><small>{student.period}</small></span>
@@ -203,6 +289,12 @@
 
         <main class="lesson-content">
           {#if view === 'overview'}
+            {#if assignment}
+              <section class="assignment-banner" aria-labelledby="assignment-title">
+                <div><p>Teacher assignment</p><h2 id="assignment-title">{assignment.title}</h2><span>{assignmentRequirements(assignment).join(' · ')}</span></div>
+                <div>{#if assignment.dueDate}<small>Due date</small><strong>{new Date(`${assignment.dueDate}T12:00:00`).toLocaleDateString()}</strong>{:else}<small>Assigned pathway</small><strong>{effectiveLesson.passages.length} passages</strong>{/if}</div>
+              </section>
+            {/if}
             <section class="lesson-landing" aria-labelledby="lesson-title">
               <div class="landing-copy">
                 <p>{lesson.eyebrow}</p>
@@ -215,15 +307,15 @@
               </div>
               <div class="progress-medallion" style={`--progress:${summary.percentage * 3.6}deg`}>
                 <div><strong>{summary.percentage}%</strong><span>complete</span></div>
-                <small>{summary.fullPassages}<br />passages</small>
+                <small>{summary.fullPassages}/{effectiveLesson.passages.length}<br />passages</small>
               </div>
             </section>
 
             <section class="student-dashboard" aria-label="Student progress summary">
               <div><small>Welcome back</small><strong>{student.firstName}</strong><span>{student.period}</span></div>
               <div><small>Next passage</small><strong>{nextPassage.reference}</strong><span>{nextPassage.title}</span></div>
-              <div><small>Checks</small><strong>{summary.quizCorrect + summary.sortCorrect}/{lesson.quiz.length + lesson.sortingActivity.length}</strong><span>correct matches</span></div>
-              <div><small>Saved</small><strong>On this device</strong><span>{new Date(state.updatedAt).toLocaleDateString()}</span></div>
+              <div><small>Checks</small><strong>{summary.quizCorrect + summary.sortCorrect}/{effectiveLesson.quiz.length + effectiveLesson.sortingActivity.length}</strong><span>correct matches</span></div>
+              <div><small>Saved</small><strong>On this device</strong><span>{new Date(state.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span></div>
             </section>
 
             <UnitToolkit lens={lesson.gospelLens} gospelName={lesson.shortName} />
@@ -244,21 +336,23 @@
                 passage={activePassage}
                 response={state.responses[activePassage.id] ?? emptyPassageResponse()}
                 {teacherMode}
+                unlockRequired={assignment?.requireUnlock ?? true}
+                exemplarsEnabled={assignment?.allowExemplars ?? true}
                 onChange={(response) => updatePassage(activePassage.id, response)}
                 onBack={() => (activePassageId = '')}
               />
             {:else}
-              <PassageSelector passages={lesson.passages} responses={state.responses} onSelect={openPassage} />
+              <PassageSelector passages={effectiveLesson.passages} responses={state.responses} onSelect={openPassage} />
             {/if}
           {:else if view === 'quiz'}
             <ExegesisQuiz
-              items={lesson.quiz}
+              items={effectiveLesson.quiz}
               answers={state.quizAnswers}
               onAnswer={(id, answer) => commit({ ...state, quizAnswers: { ...state.quizAnswers, [id]: answer } })}
             />
           {:else if view === 'sorter'}
             <FourSensesSorter
-              items={lesson.sortingActivity}
+              items={effectiveLesson.sortingActivity}
               answers={state.sortAnswers}
               onAnswer={(id, answer) => commit({ ...state, sortAnswers: { ...state.sortAnswers, [id]: answer } })}
             />
@@ -268,12 +362,15 @@
               synthesis={state.synthesis}
               reflectionChoice={state.reflectionChoice}
               reflectionResponse={state.reflectionResponse}
+              showSynthesis={assignment?.requireSynthesis ?? true}
+              showReflection={assignment?.requireReflection ?? true}
               onSynthesis={(value) => commit({ ...state, synthesis: value })}
               onReflectionChoice={(value) => commit({ ...state, reflectionChoice: value })}
               onReflectionResponse={(value) => commit({ ...state, reflectionResponse: value })}
             />
           {:else if view === 'collection'}
-            <TeacherCollectionView {lesson} {student} {state} onExport={downloadWork} onCopy={copyWork} onPrint={() => window.print()} />
+            <TeacherCollectionView lesson={effectiveLesson} {student} {state} onExport={downloadWork} onCopy={copyWork} onPrint={() => window.print()} />
+            <BackupControls {hasRecovery} onBackup={downloadBackup} onImport={importBackup} onRestore={restoreRecovery} />
             <section class="data-controls no-print">
               <div><h3>Saved-work controls</h3><p>Use these only when you intend to remove work stored in this browser.</p></div>
               <div><button on:click={resetResponses}>Clear lesson responses</button><button class="danger" on:click={clearEverything}>Clear work + student info</button></div>
@@ -282,7 +379,7 @@
         </main>
 
         <nav class="mobile-nav" aria-label="Mobile lesson sections">
-          {#each navItems.slice(0, 5) as item}
+          {#each visibleNavItems.filter((item) => item.id !== 'collection').slice(0, 5) as item}
             <button class:active={view === item.id} on:click={() => navigate(item.id)}><span>{item.icon}</span>{item.short}</button>
           {/each}
         </nav>
@@ -337,7 +434,16 @@
   .student-menu strong { font-size: .72rem; }
   .student-menu small { color: var(--lesson-muted); font-size: .59rem; }
   .student-menu button { margin-left: 4px; border: 0; border-bottom: 1px solid var(--lesson-border); background: none; color: var(--lesson-secondary); font-size: .62rem; cursor: pointer; }
+  .save-status { color: var(--lesson-secondary); font-size: .62rem; font-weight: 760; white-space: nowrap; }
   .lesson-content { width: min(1160px, calc(100% - 56px)); margin: 0 auto; padding: 44px 0 110px; }
+  .assignment-banner { margin-bottom: 15px; display: flex; justify-content: space-between; gap: 25px; align-items: center; padding: 19px 22px; border: 1px solid color-mix(in srgb, var(--lesson-accent) 46%, var(--lesson-border)); border-radius: 15px; background: color-mix(in srgb, var(--lesson-accent) 10%, var(--lesson-surface)); }
+  .assignment-banner p { margin: 0 0 4px; color: var(--lesson-secondary); font-size: .61rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+  .assignment-banner h2 { margin: 0 0 4px; font: 400 1.45rem Georgia, serif; }
+  .assignment-banner div > span { color: var(--lesson-muted); font-size: .68rem; }
+  .assignment-banner > div:last-child { flex: 0 0 auto; min-width: 120px; padding-left: 18px; border-left: 1px solid var(--lesson-border); }
+  .assignment-banner small, .assignment-banner strong { display: block; }
+  .assignment-banner small { color: var(--lesson-muted); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; }
+  .assignment-banner strong { margin-top: 5px; font-size: .78rem; }
   .lesson-landing { min-height: 480px; display: grid; grid-template-columns: 1.35fr .65fr; align-items: center; gap: 50px; padding: clamp(34px, 6vw, 68px); border-radius: 28px; background: var(--lesson-primary); color: var(--lesson-surface); overflow: hidden; position: relative; }
   .lesson-landing::before { content: ''; position: absolute; width: 470px; height: 470px; border: 1px solid color-mix(in srgb, var(--lesson-accent) 45%, transparent); border-radius: 50%; right: -210px; top: -260px; box-shadow: 0 0 0 70px color-mix(in srgb, var(--lesson-accent) 5%, transparent); }
   .landing-copy { position: relative; z-index: 1; }
@@ -395,6 +501,7 @@
   @media (max-width: 760px) {
     .topbar { padding: 0 15px; min-height: 62px; }
     .crumb { display: none; }
+    .save-status { margin-left: auto; }
     .lesson-content { width: min(100% - 28px, 1160px); padding: 24px 0 95px; }
     .lesson-landing { min-height: auto; grid-template-columns: 1fr; }
     .progress-medallion { width: 190px; justify-self: start; }
@@ -407,6 +514,8 @@
     .mobile-nav button.active { background: color-mix(in srgb, var(--lesson-secondary) 9%, transparent); color: var(--lesson-text); }
     .data-controls { display: block; }
     .data-controls > div:last-child { margin-top: 16px; flex-wrap: wrap; }
+    .assignment-banner { display: block; }
+    .assignment-banner > div:last-child { margin-top: 14px; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--lesson-border); }
   }
   @media (max-width: 520px) {
     .student-menu > span:not(.student-avatar) { display: none; }

@@ -16,7 +16,10 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
       <span class="brand-mark" aria-hidden="true">H</span>
       <span><strong>HRE4M</strong><small>Interactive Learning Hub</small></span>
     </a>
-    <span class="course-chip">Grade 12 · Catholic Religion</span>
+    <div class="header-actions">
+      <a class="teacher-link" href={`${base}teacher/`}>Teacher tools</a>
+      <span class="course-chip">Grade 12 · Catholic Religion</span>
+    </div>
   </header>
 
   <main id="main-content">
@@ -104,6 +107,6 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
   <footer class="hub-footer">
     <span>HRE4M Interactive Learning Hub</span>
-    <span>Use your NRSV / NRSV-CE Bible alongside each activity.</span>
+    <span>Use your NRSV / NRSV-CE Bible alongside each activity. · <a href={`${base}privacy/`}>Privacy</a></span>
   </footer>
 </BaseLayout>
