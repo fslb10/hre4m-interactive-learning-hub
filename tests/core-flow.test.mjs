@@ -21,6 +21,8 @@ import {
   saveRecoverySnapshot,
 } from '../src/utils/storage.ts';
 import { grantTeacherAccess, hasTeacherAccess, revokeTeacherAccess, validTeacherPin } from '../src/utils/teacherAccess.ts';
+import { johnLesson } from '../src/content/lessons/john.ts';
+import { applyLessonFeatureFlags } from '../src/utils/features.ts';
 
 const lesson = {
   id: 'gospel-john',
@@ -108,8 +110,10 @@ test('media data is credited, purposeful, and teacher links can exclude optional
     images: [{ id: 'jars', src: 'media/jars.svg', hosting: 'local', alt: 'Six jars.' }],
     credit: {
       sourceName: 'Local library',
+      sourceUrl: 'media/jars.svg',
       creator: 'HRE4M Interactive Learning Hub',
       licence: 'CC BY 4.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by/4.0/',
       attribution: 'Six Stone Jars, HRE4M Interactive Learning Hub, CC BY 4.0.',
     },
   }];
@@ -127,6 +131,30 @@ test('media data is credited, purposeful, and teacher links can exclude optional
       response: 'There are six jars.',
     },
   );
+});
+
+test('John media pilot is limited to three passages and every item meets the media contract', () => {
+  const pilotPassages = johnLesson.passages.filter((passage) => passage.pilot?.featureFlag === 'john-media-pilot');
+  assert.deepEqual(pilotPassages.map((passage) => passage.id), ['john-1-word', 'john-6-bread', 'john-9-sight']);
+  assert.equal(pilotPassages.flatMap((passage) => passage.media ?? []).length, 6);
+  assert.deepEqual(pilotPassages.flatMap((passage) => (passage.media ?? []).flatMap(mediaDataErrors)), []);
+  for (const passage of pilotPassages) {
+    const media = passage.media ?? [];
+    assert.equal(media.filter((item) => item.placement === 'hook').length, 1);
+    assert.equal(media.filter((item) => item.placement === 'study').length, 1);
+    assert.ok(media.every((item) => (item.afterViewing?.length ?? 0) > 0));
+    assert.ok(media.every((item) => item.type !== 'image' || (item.observationPrompts?.length ?? 0) > 0));
+    assert.ok(passage.pilot.evidenceChecks.length >= 4);
+  }
+  assert.equal(johnLesson.passages.filter((passage) => passage.media?.some((item) => item.featureFlag === 'john-media-pilot')).length, 3);
+});
+
+test('John media pilot can be disabled without removing the original passages or Cana media', () => {
+  const disabled = applyLessonFeatureFlags(johnLesson, { 'john-media-pilot': false });
+  assert.equal(disabled.passages.length, johnLesson.passages.length);
+  assert.equal(disabled.passages.filter((passage) => passage.pilot).length, 0);
+  assert.equal(disabled.passages.flatMap((passage) => passage.media ?? []).some((item) => item.featureFlag === 'john-media-pilot'), false);
+  assert.equal(disabled.passages.find((passage) => passage.id === 'john-2-cana')?.media?.length, 1);
 });
 
 test('YouTube clips use privacy-enhanced click-to-load URLs with captions and timestamps', () => {

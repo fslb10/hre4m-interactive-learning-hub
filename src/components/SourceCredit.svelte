@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { MediaCredit } from '../content/types';
+  import { deploymentSafeMediaUrl } from '../utils/media';
 
   export let credit: MediaCredit;
+  const base = import.meta.env.BASE_URL;
+  $: sourceUrl = credit.sourceUrl
+    ? deploymentSafeMediaUrl(credit.sourceUrl, /^https?:\/\//i.test(credit.sourceUrl) ? 'external' : 'local', base)
+    : '';
 </script>
 
 <footer class="source-credit">
@@ -9,7 +14,7 @@
     <summary>Source and licence</summary>
     <dl>
       <div><dt>Creator</dt><dd>{credit.creator}</dd></div>
-      <div><dt>Source</dt><dd>{#if credit.sourceUrl}<a href={credit.sourceUrl} target="_blank" rel="noreferrer">{credit.sourceName} <span aria-hidden="true">↗</span></a>{:else}{credit.sourceName}{/if}</dd></div>
+      <div><dt>Source</dt><dd>{#if sourceUrl}<a href={sourceUrl} target="_blank" rel="noreferrer">{credit.sourceName} <span aria-hidden="true">↗</span></a>{:else}{credit.sourceName}{/if}</dd></div>
       <div><dt>Licence</dt><dd>{#if credit.licenceUrl}<a href={credit.licenceUrl} target="_blank" rel="noreferrer">{credit.licence}</a>{:else}{credit.licence}{/if}</dd></div>
     </dl>
     <p>{credit.attribution}</p>

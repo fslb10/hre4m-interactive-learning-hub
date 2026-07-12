@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">From Word to Flesh visual hook</title><desc id="desc">Word, Light, Life, and Flesh connected in a sequence, moving from luminous forms to a warm solid panel.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#10183a"/><stop offset="1" stop-color="#283b70"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <rect width="1200" height="520" rx="28" fill="url(#bg)"/><text x="70" y="75" fill="#f0c66f" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="5">JOHN 1 · NOTICE THE MOVEMENT</text>
+  <g font-family="Georgia,serif" font-size="56" text-anchor="middle"><text x="175" y="280" fill="#fff" filter="url(#glow)">WORD</text><text x="455" y="280" fill="#ffe18f" filter="url(#glow)">LIGHT</text><text x="725" y="280" fill="#fff7cc" filter="url(#glow)">LIFE</text></g>
+  <g fill="none" stroke="#f0c66f" stroke-width="4"><path d="M285 260h48"/><path d="m325 248 13 12-13 12"/><path d="M568 260h48"/><path d="m608 248 13 12-13 12"/><path d="M824 260h48"/><path d="m864 248 13 12-13 12"/></g>
+  <rect x="900" y="154" width="235" height="210" rx="24" fill="#d99573"/><text x="1017" y="278" fill="#251a24" font-family="Georgia,serif" font-size="54" text-anchor="middle">FLESH</text>
+  <text x="70" y="448" fill="#c5cce1" font-family="Arial,sans-serif" font-size="21">What changes when the sequence becomes embodied?</text>
+</svg>

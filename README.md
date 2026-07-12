@@ -131,6 +131,12 @@ Add a transcript whenever the video supplies one and record caption availability
 
 `john-2-cana` contains one optional guided-image demonstration using the locally hosted, CC BY 4.0 “Six Stone Jars” schematic. It exercises observation hotspots, before/after questions, saved media notes, attribution, deployment-safe paths, and offline precaching without populating the other passages.
 
+## Three-passage John media pilot
+
+The media-rich investigation sequence is enabled only for `john-1-word`, `john-6-bread`, and `john-9-sight`. Each pilot uses a required visual hook followed by a required text-analysis image; all six assets are teacher-created, locally hosted, CC BY 4.0, credited, precached, and paired with student response checkpoints. The other 37 passages keep their existing experience.
+
+The pilot defaults to enabled. Set `PUBLIC_ENABLE_JOHN_MEDIA_PILOT=false` during a build to remove the pilot sequence and its flagged media without deleting the three original passages or changing saved student work. This build-time flag provides a quick classroom rollback while the pilot is evaluated.
+
 ## Add a future unit
 
 Unit 2 is the first module in a multi-unit hub. Future units should keep their own data types and activity shells while reusing the project-level layout, visual tokens, student information pattern, storage utilities, export conventions, and accessibility standards.

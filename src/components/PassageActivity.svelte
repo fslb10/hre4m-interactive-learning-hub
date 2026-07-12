@@ -3,6 +3,7 @@
   import type { PassageResponse } from '../utils/storage';
   import { EXIT_MIN, LITERAL_MIN, SENSE_MIN } from '../utils/progress';
   import PassageMedia from './PassageMedia.svelte';
+  import PilotPassageActivity from './PilotPassageActivity.svelte';
 
   export let passage: GospelPassage;
   export let response: PassageResponse;
@@ -67,6 +68,9 @@
   ];
 </script>
 
+{#if passage.pilot}
+  <PilotPassageActivity {passage} {response} {teacherMode} {unlockRequired} {exemplarsEnabled} {onChange} {onBack} />
+{:else}
 <article class="case-file">
   <button class="back-button" on:click={onBack}><span aria-hidden="true">←</span> Passage library</button>
 
@@ -229,6 +233,7 @@
     </section>{/if}
   </section>
 </article>
+{/if}
 
 <style>
   .case-file { display: grid; gap: 26px; }

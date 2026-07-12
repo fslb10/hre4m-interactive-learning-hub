@@ -11,6 +11,8 @@ export type InstructionalPurpose =
   | 'Prompt textual evidence'
   | 'Prepare for one of the Four Senses';
 
+export type FeatureFlagId = 'john-media-pilot';
+
 export type MediaCredit = {
   sourceName: string;
   sourceUrl?: string;
@@ -50,6 +52,8 @@ type BasePassageMedia = {
   title: string;
   instructionalPurpose: InstructionalPurpose;
   optional: boolean;
+  placement?: 'hook' | 'study';
+  featureFlag?: FeatureFlagId;
   description?: string;
   textAlternative: string;
   beforeViewing?: MediaQuestion[];
@@ -138,6 +142,12 @@ export type GospelPassage = {
   prompts: PassagePrompts;
   exemplars: Record<SenseKey, string>;
   media?: PassageMedia[];
+  pilot?: {
+    featureFlag: FeatureFlagId;
+    label: string;
+    openBibleInstruction: string;
+    evidenceChecks: Array<{ id: string; label: string }>;
+  };
 };
 
 export type QuizItem = {

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Seeing is not yet understanding visual hook</title><desc id="desc">A stylized eye contains I see, I know, and I understand, with each phrase becoming more obscured.</desc>
+  <defs><linearGradient id="fade"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></linearGradient></defs><rect width="1200" height="520" rx="28" fill="#10183a"/><text x="65" y="65" fill="#f0c66f" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="4">JOHN 9 · SIGHT IS NOT THE SAME AS INSIGHT</text>
+  <path d="M110 274c165-190 815-190 980 0-165 190-815 190-980 0z" fill="#263a72" stroke="#7990c7" stroke-width="5"/><circle cx="600" cy="274" r="135" fill="#d7a13e"/><circle cx="600" cy="274" r="72" fill="#10183a"/><circle cx="560" cy="235" r="18" fill="#fff" opacity=".9"/>
+  <g font-family="Georgia,serif" font-size="38" text-anchor="middle"><text x="315" y="260" fill="#fff">I SEE</text><text x="600" y="462" fill="#fff" opacity=".56">I KNOW</text><text x="875" y="260" fill="url(#fade)" opacity=".32">I UNDERSTAND</text></g>
+  <path d="M754 205h250M754 225h210M754 245h170M754 265h130M754 285h90" stroke="#10183a" stroke-width="15" opacity=".72"/>
+  <text x="600" y="105" fill="#c1c9df" font-family="Arial,sans-serif" font-size="20" text-anchor="middle">Which claim is easiest to make? Which is hardest to justify?</text>
+</svg>

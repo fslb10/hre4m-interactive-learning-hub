@@ -11,14 +11,23 @@
   export let media: PassageMediaItem[] = [];
   export let responses: Record<string, string> = {};
   export let onResponse: (key: string, value: string) => void = () => {};
+  export let mode: 'default' | 'hook' | 'study' = 'default';
+
+  const headings = {
+    default: { eyebrow: 'Media studio', title: 'Look, listen, then return to the text', note: 'Each item has a specific learning purpose. Your checkpoint notes autosave with this passage.' },
+    hook: { eyebrow: 'Visual hook', title: 'Begin with careful noticing', note: 'Pause before explaining. Record what the visual makes you notice, then open the text.' },
+    study: { eyebrow: 'Interpretive media', title: 'Test your first reading', note: 'Use the media to notice structure and contrast, then verify every interpretation against the passage.' },
+  };
+
+  $: heading = headings[mode];
 </script>
 
 {#if media.length}
-  <section class="passage-media" aria-labelledby="media-section-title">
+  <section class="passage-media" aria-labelledby={`media-section-title-${mode}`}>
     <div class="media-heading">
-      <p>Media studio</p>
-      <h2 id="media-section-title">Look, listen, then return to the text</h2>
-      <span>Each item has a specific learning purpose. Your checkpoint notes autosave with this passage.</span>
+      <p>{heading.eyebrow}</p>
+      <h2 id={`media-section-title-${mode}`}>{heading.title}</h2>
+      <span>{heading.note}</span>
     </div>
 
     {#each media as item (item.id)}

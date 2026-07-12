@@ -5,6 +5,14 @@ const repository = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? '';
 const base = process.env.GITHUB_ACTIONS && repository ? `/${repository}/` : '/';
 const dist = join(process.cwd(), 'dist');
 const failures = [];
+const pilotMediaAssets = [
+  'media/john1-word-light-hook.svg',
+  'media/john1-prologue-pattern.svg',
+  'media/john6-bread-sign-hook.svg',
+  'media/john6-bread-of-life-map.svg',
+  'media/john9-sight-hook.svg',
+  'media/john9-sight-testimony-map.svg',
+];
 
 const requireFile = (path, label = path) => {
   if (!existsSync(join(dist, path))) failures.push(`Missing ${label}: dist/${path}`);
@@ -22,6 +30,7 @@ for (const route of [
   'sw.js',
   'app-icon.png',
   'media/cana-jars-observation.svg',
+  ...pilotMediaAssets,
 ]) {
   requireFile(route);
 }
@@ -31,6 +40,9 @@ if (existsSync(serviceWorkerPath)) {
   const serviceWorker = readFileSync(serviceWorkerPath, 'utf8');
   if (!serviceWorker.includes("'./media/cana-jars-observation.svg'")) {
     failures.push('The demonstration media asset is not included in the offline app shell.');
+  }
+  for (const asset of pilotMediaAssets) {
+    if (!serviceWorker.includes(`'./${asset}'`)) failures.push(`Pilot media is missing from the offline app shell: ${asset}`);
   }
 }
 

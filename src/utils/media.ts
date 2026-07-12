@@ -40,8 +40,8 @@ export function mediaDataErrors(media: PassageMedia): string[] {
   if (!media.title.trim()) errors.push(`${media.id || 'Media'} needs a title.`);
   if (!media.instructionalPurpose) errors.push(`${media.id || 'Media'} needs an instructional purpose.`);
   if (!media.textAlternative.trim()) errors.push(`${media.id || 'Media'} needs a text alternative.`);
-  if (!media.credit.creator.trim() || !media.credit.licence.trim() || !media.credit.attribution.trim()) {
-    errors.push(`${media.id || 'Media'} needs creator, licence, and attribution information.`);
+  if (!media.credit.sourceName.trim() || !media.credit.sourceUrl?.trim() || !media.credit.creator.trim() || !media.credit.licence.trim() || !media.credit.licenceUrl?.trim() || !media.credit.attribution.trim()) {
+    errors.push(`${media.id || 'Media'} needs source, link, creator, licence link, and attribution information.`);
   }
   if (media.type === 'image' && media.images.length === 0) errors.push(`${media.id} needs at least one image.`);
   if (media.type === 'youtube' && !/^[A-Za-z0-9_-]{11}$/.test(media.youtubeId)) {
