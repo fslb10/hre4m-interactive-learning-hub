@@ -4,6 +4,7 @@
   import GuidedImage from './GuidedImage.svelte';
   import MediaCard from './MediaCard.svelte';
   import MediaCheckpoint from './MediaCheckpoint.svelte';
+  import MotionGraphic from './MotionGraphic.svelte';
   import SourceCredit from './SourceCredit.svelte';
   import TranscriptPanel from './TranscriptPanel.svelte';
   import YouTubeClip from './YouTubeClip.svelte';
@@ -38,6 +39,8 @@
           <TranscriptPanel transcript={item.transcript} captions={item.captions} />
         {:else if item.type === 'audio'}
           <AudioGuide {item} {responses} {onResponse} />
+        {:else if item.type === 'video'}
+          <MotionGraphic {item} />
         {:else}
           <YouTubeClip {item} />
         {/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { QuizItem } from '../content/types';
+  import InlineMotion from './InlineMotion.svelte';
 
   export let items: QuizItem[];
   export let answers: Record<string, string>;
@@ -17,6 +18,15 @@
     </div>
     <div class="score"><strong>{correct}</strong><span>/{items.length}<br />correct</span></div>
   </header>
+
+  <InlineMotion
+    id="exegesis-eisegesis-motion"
+    title="Exegesis or Eisegesis? Follow the Evidence"
+    description="Watch the two reading paths before testing each claim against the passage."
+    src="media/exegesis-eisegesis-motion.mp4"
+    poster="media/exegesis-eisegesis-poster.png"
+    textAlternative="The animation presents a passage at the centre and compares two paths. The exegesis path moves through words, context, genre, and structure before reaching a supported claim. The eisegesis path begins with an assumption and pushes it into the passage, producing an unsupported claim. It ends with the question: What in the passage supports this?"
+  />
 
   <div class="quiz-list">
     {#each items as item, index}

@@ -95,7 +95,7 @@ The shared prompts are applied automatically and can be overridden per passage w
 
 ## Author passage media
 
-Media belongs in a passage's `media` array in `src/content/lessons/*.ts`; do not hard-code media URLs in page components. The union types in `src/content/types.ts` support `image`, `audio`, and `youtube` items. Every item must include:
+Media belongs in a passage's `media` array in `src/content/lessons/*.ts`; do not hard-code media URLs in page components. The union types in `src/content/types.ts` support `image`, `audio`, local or external `video`, and `youtube` items. Every item must include:
 
 - a stable `id`, `title`, `type`, and `optional` setting
 - one defined `instructionalPurpose` from the approved purpose list
@@ -103,7 +103,7 @@ Media belongs in a passage's `media` array in `src/content/lessons/*.ts`; do not
 - `credit` with source, creator, licence, and a ready-to-display attribution line
 - optional `beforeViewing` and `afterViewing` question arrays with stable question ids
 
-The reusable renderer uses `MediaCard`, `GuidedImage`, `AudioGuide`, `YouTubeClip`, `MediaCheckpoint`, `TranscriptPanel`, and `SourceCredit`. Checkpoint answers are keyed by media and question id and are included in the existing local autosave, recovery snapshot, and portable backup.
+The reusable renderer uses `MediaCard`, `GuidedImage`, `AudioGuide`, `MotionGraphic`, `YouTubeClip`, `MediaCheckpoint`, `TranscriptPanel`, and `SourceCredit`. Checkpoint answers are keyed by media and question id and are included in the existing local autosave, recovery snapshot, and portable backup.
 
 ### Image and gallery fields
 
@@ -114,6 +114,21 @@ Store local media under `public/media/` and author its `src` without a leading s
 ### Audio fields
 
 Audio items use an `audio` object with `src`, `hosting`, and `mimeType`. Browsers receive a native, keyboard-accessible player with `preload="metadata"` and no autoplay. Add `reflectionPrompts`, a cue-based `transcript`, and caption metadata when available; caption files may also declare `hosting` as `local` or `external`. A transcript is required in practice for spoken instructional content even though the type remains optional for media without speech.
+
+### Local video and Remotion fields
+
+Video items use a `video` object with `src`, `hosting`, `mimeType`, `silent`, optional dimensions, and an optional deployment-safe poster. The native player uses controls, `playsinline`, `preload="metadata"`, and no autoplay. A silent motion graphic still needs a complete text alternative; video with meaningful audio must also provide a transcript and caption track.
+
+Editable motion-graphics source lives in `remotion/`, following the official [Remotion GitHub project](https://github.com/remotion-dev/remotion) and its current agent-skill guidance. Remotion is an authoring dependency only: the student-facing Astro/Svelte bundle serves the rendered MP4 and poster from `public/media/` without shipping React or the Remotion runtime.
+
+- `npm run motion:studio` opens the visual editor.
+- `npm run motion:poster` refreshes every poster frame.
+- `npm run motion:render` renders every production MP4.
+- `npm run motion:render:all` refreshes posters and MP4s together.
+
+The motion library currently contains eight short, silent explainers: the Four Senses, Exegesis vs. Eisegesis, Cana, Samaritan Recognition, Mark’s Two Daughters, Matthew’s Four Soils, Luke’s Lost Sons, and Emmaus. The first two are reusable teaching tools; the other six are attached to the passage where their visual structure adds interpretive value. Reusable videos are pre-cached for offline teaching, while passage videos are cached after first use to keep the initial app download manageable.
+
+All `remotion` and `@remotion/*` package versions are exact-pinned and must remain matched.
 
 ### YouTube fields
 
@@ -129,7 +144,7 @@ Add a transcript whenever the video supplies one and record caption availability
 
 ### Demonstration item
 
-`john-2-cana` contains one optional guided-image demonstration using the locally hosted, CC BY 4.0 “Six Stone Jars” schematic. It exercises observation hotspots, before/after questions, saved media notes, attribution, deployment-safe paths, and offline precaching without populating the other passages.
+`john-2-cana` contains two optional, locally hosted CC BY 4.0 demonstrations: the “Six Stone Jars” guided-image schematic and the silent “From Need to Sign” Remotion motion graphic. Together they exercise observation hotspots, native video controls, a poster and low-bandwidth route, before/after questions, saved media notes, attribution, deployment-safe paths, and offline precaching without populating the other passages.
 
 ## Three-passage John media pilot
 

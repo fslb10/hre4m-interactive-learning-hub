@@ -1,4 +1,4 @@
-import { definePassage, type GospelLesson } from '../types';
+import { definePassage, type GospelLesson } from '../types.ts';
 
 export const markLesson: GospelLesson = {
   id: 'gospel-mark',
@@ -162,6 +162,18 @@ export const markLesson: GospelLesson = {
         'Avoid blaming people who are not healed for lacking faith. Mark presents faith as vulnerable trust, not a technique that controls outcomes.',
       teacherNote:
         'Use a parallel chart to compare the unnamed woman and Jairus’s daughter.',
+      media: [
+        {
+          id: 'mark5-two-daughters-motion', type: 'video', title: 'Two Daughters, One Movement of Restoration',
+          instructionalPurpose: 'Compare interpretations', optional: true,
+          description: 'See how Mark’s interruption connects Jairus’s daughter and the woman who has suffered for twelve years.',
+          textAlternative: 'The animation begins with Jairus asking Jesus to help his daughter. A second line interrupts the journey as the woman reaches through the crowd and is healed. The shared detail of twelve years links the stories before both women are named as daughters within one movement of restoration. It ends with the insight that the delay makes room for another daughter.',
+          beforeViewing: [{ id: 'interruption', prompt: 'Where does Mark interrupt Jairus’s story, and what changes during the delay?' }],
+          afterViewing: [{ id: 'together', prompt: 'How does reading the two stories together change your understanding of faith, dignity, or restoration?' }],
+          video: { src: 'media/mark5-two-daughters-motion.mp4', hosting: 'local', mimeType: 'video/mp4', silent: true, width: 1280, height: 720, poster: { src: 'media/mark5-two-daughters-poster.png', hosting: 'local' } },
+          credit: { sourceName: 'HRE4M Remotion motion library', sourceUrl: 'media/mark5-two-daughters-motion.mp4', creator: 'HRE4M Interactive Learning Hub', licence: 'CC BY 4.0', licenceUrl: 'https://creativecommons.org/licenses/by/4.0/', attribution: 'Two Daughters, One Movement of Restoration by HRE4M Interactive Learning Hub, licensed CC BY 4.0.' },
+        },
+      ],
       exemplars: {
         literal:
           'Jairus asks Jesus to save his dying daughter. On the way, a woman suffering for twelve years touches Jesus and is healed; after news of the girl’s death, Jesus continues, takes her hand, and raises her.',

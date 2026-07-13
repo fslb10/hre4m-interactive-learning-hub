@@ -106,7 +106,23 @@ export type YouTubeClipMedia = BasePassageMedia & {
   playlistId?: string;
 };
 
-export type PassageMedia = GuidedImageMedia | AudioGuideMedia | YouTubeClipMedia;
+export type MotionGraphicMedia = BasePassageMedia & {
+  type: 'video';
+  video: {
+    src: string;
+    hosting: 'local' | 'external';
+    mimeType: string;
+    silent: boolean;
+    width?: number;
+    height?: number;
+    poster?: {
+      src: string;
+      hosting: 'local' | 'external';
+    };
+  };
+};
+
+export type PassageMedia = GuidedImageMedia | AudioGuideMedia | MotionGraphicMedia | YouTubeClipMedia;
 
 export type ThemeColors = {
   background: string;

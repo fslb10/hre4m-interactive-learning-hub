@@ -1,4 +1,4 @@
-import { definePassage, type GospelLesson } from '../types';
+import { definePassage, type GospelLesson } from '../types.ts';
 
 export const lukeLesson: GospelLesson = {
   id: 'gospel-luke',
@@ -220,6 +220,18 @@ export const lukeLesson: GospelLesson = {
         'Avoid calling only the younger son lost. The older son’s resentment and refusal of relationship reveal another form of distance from the father.',
       teacherNote:
         'Track the father’s movement toward each son and the dignity-restoring details of the welcome.',
+      media: [
+        {
+          id: 'luke15-lost-sons-motion', type: 'video', title: 'The Father Goes Out Twice',
+          instructionalPurpose: 'Compare interpretations', optional: true,
+          description: 'Follow the father’s movement toward both the younger and older son to examine two forms of lostness.',
+          textAlternative: 'The animation places the younger son, father, and older son in a three-part scene. The younger son is distant in the far country; the father runs out to restore him. The older son remains distant at the threshold; the father also goes out to plead with him. The ending states that mercy seeks both without denying truth.',
+          beforeViewing: [{ id: 'distance', prompt: 'Where is each son physically and relationally distant from the father?' }],
+          afterViewing: [{ id: 'mercy', prompt: 'How does the father’s movement toward both sons reshape the meaning of lostness and mercy?' }],
+          video: { src: 'media/luke15-lost-sons-motion.mp4', hosting: 'local', mimeType: 'video/mp4', silent: true, width: 1280, height: 720, poster: { src: 'media/luke15-lost-sons-poster.png', hosting: 'local' } },
+          credit: { sourceName: 'HRE4M Remotion motion library', sourceUrl: 'media/luke15-lost-sons-motion.mp4', creator: 'HRE4M Interactive Learning Hub', licence: 'CC BY 4.0', licenceUrl: 'https://creativecommons.org/licenses/by/4.0/', attribution: 'The Father Goes Out Twice by HRE4M Interactive Learning Hub, licensed CC BY 4.0.' },
+        },
+      ],
       exemplars: {
         literal:
           'A younger son wastes his inheritance, returns hoping to become a worker, and is welcomed with restored family status and a feast. The older son refuses to celebrate, and the father goes out to plead with him too.',
@@ -307,6 +319,18 @@ export const lukeLesson: GospelLesson = {
         'Avoid treating personal spiritual feeling as the whole message. Recognition is tested by Scripture, hospitality, sacramental action, and renewed community.',
       teacherNote:
         'Map the story’s sequence against the Liturgy of the Word and Liturgy of the Eucharist.',
+      media: [
+        {
+          id: 'luke24-emmaus-motion', type: 'video', title: 'Emmaus: Road, Word, Table, Mission',
+          instructionalPurpose: 'Clarify Catholic teaching', optional: true,
+          description: 'Map Luke’s narrative sequence alongside the movement of the Mass.',
+          textAlternative: 'The animation follows the Emmaus story from road and disappointment, through Scripture and burning hearts, to table, recognition in broken bread, and return to Jerusalem. A second strip aligns these stages with gathering, the Word, Eucharist, and mission. It ends by emphasizing that the disciples return to the community.',
+          beforeViewing: [{ id: 'sequence', prompt: 'List the stages between disappointment and recognition.' }],
+          afterViewing: [{ id: 'mass-resonance', prompt: 'Which part of Luke’s sequence most strongly supports the passage’s resonance with the Mass?' }],
+          video: { src: 'media/luke24-emmaus-motion.mp4', hosting: 'local', mimeType: 'video/mp4', silent: true, width: 1280, height: 720, poster: { src: 'media/luke24-emmaus-poster.png', hosting: 'local' } },
+          credit: { sourceName: 'HRE4M Remotion motion library', sourceUrl: 'media/luke24-emmaus-motion.mp4', creator: 'HRE4M Interactive Learning Hub', licence: 'CC BY 4.0', licenceUrl: 'https://creativecommons.org/licenses/by/4.0/', attribution: 'Emmaus: Road, Word, Table, Mission by HRE4M Interactive Learning Hub, licensed CC BY 4.0.' },
+        },
+      ],
       exemplars: {
         literal:
           'Two disappointed disciples leave Jerusalem and speak with an unrecognized Jesus. He interprets Scripture, accepts their hospitality, is recognized in the breaking of bread, and they return to the community.',

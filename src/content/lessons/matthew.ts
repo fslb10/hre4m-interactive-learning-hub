@@ -1,4 +1,4 @@
-import { definePassage, type GospelLesson } from '../types';
+import { definePassage, type GospelLesson } from '../types.ts';
 
 export const matthewLesson: GospelLesson = {
   id: 'gospel-matthew',
@@ -220,6 +220,18 @@ export const matthewLesson: GospelLesson = {
         'Avoid permanently labelling other people as one bad soil. The parable invites every listener to examine changing conditions within the heart and community.',
       teacherNote:
         'Shift students from judging four kinds of people to examining four kinds of response.',
+      media: [
+        {
+          id: 'matthew13-four-soils-motion', type: 'video', title: 'One Seed, Four Conditions of Hearing',
+          instructionalPurpose: 'Compare interpretations', optional: true,
+          description: 'Compare what stays constant and what changes across the path, rocky ground, thorns, and good soil.',
+          textAlternative: 'The animation keeps one seed constant while showing four receiving conditions: the path, rocky ground, thorns, and good soil. Each condition is paired with a response such as no understanding, no root, competing pressures, or hearing that becomes fruit. It ends by asking students to examine conditions for hearing rather than permanently label people.',
+          beforeViewing: [{ id: 'constant-change', prompt: 'What stays constant across the four soils, and what changes?' }],
+          afterViewing: [{ id: 'conditions', prompt: 'Which detail supports interpreting the soils as changing conditions of hearing rather than permanent labels for people?' }],
+          video: { src: 'media/matthew13-four-soils-motion.mp4', hosting: 'local', mimeType: 'video/mp4', silent: true, width: 1280, height: 720, poster: { src: 'media/matthew13-four-soils-poster.png', hosting: 'local' } },
+          credit: { sourceName: 'HRE4M Remotion motion library', sourceUrl: 'media/matthew13-four-soils-motion.mp4', creator: 'HRE4M Interactive Learning Hub', licence: 'CC BY 4.0', licenceUrl: 'https://creativecommons.org/licenses/by/4.0/', attribution: 'One Seed, Four Conditions of Hearing by HRE4M Interactive Learning Hub, licensed CC BY 4.0.' },
+        },
+      ],
       exemplars: {
         literal:
           'Jesus describes seed falling on a path, shallow rock, thorny ground, and good soil. He later explains how different conditions affect whether the word is understood, endures, or bears fruit.',

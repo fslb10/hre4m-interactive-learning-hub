@@ -1,4 +1,6 @@
 <script lang="ts">
+  import InlineMotion from './InlineMotion.svelte';
+
   export let lens: string[];
   export let gospelName: string;
 </script>
@@ -43,6 +45,15 @@
       <li><b>A</b><span><strong>Anagogical</strong>Where is God leading creation?</span></li>
     </ol>
   </div>
+
+  <InlineMotion
+    id="four-senses-motion"
+    title="The Four Senses: One Text, Four Connected Questions"
+    description="Use the animation to see why the literal sense remains the foundation for allegorical, moral, and anagogical reading."
+    src="media/four-senses-motion.mp4"
+    poster="media/four-senses-poster.png"
+    textAlternative="The animation begins with the literal sense as the foundation: what the text communicates in context. Allegorical, moral, and anagogical cards then build from that foundation, asking how the passage reveals Christ and salvation, calls God's people to live, and points toward creation's fulfillment. It ends with the reminder that deeper interpretation does not mean detaching from the text."
+  />
 
   <div class="gospel-lens">
     <span class="lens-label">THE {gospelName.toUpperCase()} LENS</span>

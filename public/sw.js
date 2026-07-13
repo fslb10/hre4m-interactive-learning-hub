@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hre4m-hub-v4';
+const CACHE_NAME = 'hre4m-hub-v6';
 const APP_ROUTES = [
   './',
   './teacher/',
@@ -11,6 +11,12 @@ const APP_ROUTES = [
   './app-icon.png',
   './og.png',
   './media/cana-jars-observation.svg',
+  './media/cana-sign-motion.mp4',
+  './media/cana-sign-poster.png',
+  './media/four-senses-motion.mp4',
+  './media/four-senses-poster.png',
+  './media/exegesis-eisegesis-motion.mp4',
+  './media/exegesis-eisegesis-poster.png',
   './media/john1-word-light-hook.svg',
   './media/john1-prologue-pattern.svg',
   './media/john6-bread-sign-hook.svg',

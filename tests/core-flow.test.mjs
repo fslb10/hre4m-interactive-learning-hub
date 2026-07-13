@@ -22,6 +22,9 @@ import {
 } from '../src/utils/storage.ts';
 import { grantTeacherAccess, hasTeacherAccess, revokeTeacherAccess, validTeacherPin } from '../src/utils/teacherAccess.ts';
 import { johnLesson } from '../src/content/lessons/john.ts';
+import { markLesson } from '../src/content/lessons/mark.ts';
+import { matthewLesson } from '../src/content/lessons/matthew.ts';
+import { lukeLesson } from '../src/content/lessons/luke.ts';
 import { applyLessonFeatureFlags } from '../src/utils/features.ts';
 
 const lesson = {
@@ -149,12 +152,46 @@ test('John media pilot is limited to three passages and every item meets the med
   assert.equal(johnLesson.passages.filter((passage) => passage.media?.some((item) => item.featureFlag === 'john-media-pilot')).length, 3);
 });
 
+test('Cana includes a validated, silent Remotion motion graphic with a local poster', () => {
+  const canaMedia = johnLesson.passages.find((passage) => passage.id === 'john-2-cana')?.media ?? [];
+  assert.deepEqual(canaMedia.map((item) => item.type), ['image', 'video']);
+  assert.deepEqual(canaMedia.flatMap(mediaDataErrors), []);
+  const motion = canaMedia.find((item) => item.type === 'video');
+  assert.equal(motion?.video.src, 'media/cana-sign-motion.mp4');
+  assert.equal(motion?.video.poster?.src, 'media/cana-sign-poster.png');
+  assert.equal(motion?.video.silent, true);
+  assert.ok((motion?.textAlternative.length ?? 0) > 200);
+});
+
+test('selected Gospel passages include validated local motion explainers', () => {
+  const expected = [
+    [johnLesson, 'john-4-well', 'media/john4-recognition-motion.mp4'],
+    [markLesson, 'mark-5-daughters', 'media/mark5-two-daughters-motion.mp4'],
+    [matthewLesson, 'matthew-13-sower', 'media/matthew13-four-soils-motion.mp4'],
+    [lukeLesson, 'luke-15-prodigal', 'media/luke15-lost-sons-motion.mp4'],
+    [lukeLesson, 'luke-24-emmaus', 'media/luke24-emmaus-motion.mp4'],
+  ];
+
+  for (const [gospel, passageId, src] of expected) {
+    const media = gospel.passages.find((passage) => passage.id === passageId)?.media ?? [];
+    assert.equal(media.length, 1, `${passageId} should include one focused motion explainer`);
+    assert.deepEqual(media.flatMap(mediaDataErrors), []);
+    const motion = media[0];
+    assert.equal(motion.type, 'video');
+    assert.equal(motion.video.src, src);
+    assert.equal(motion.video.silent, true);
+    assert.ok(motion.video.poster?.src.endsWith('-poster.png'));
+    assert.ok((motion.beforeViewing?.length ?? 0) > 0);
+    assert.ok((motion.afterViewing?.length ?? 0) > 0);
+  }
+});
+
 test('John media pilot can be disabled without removing the original passages or Cana media', () => {
   const disabled = applyLessonFeatureFlags(johnLesson, { 'john-media-pilot': false });
   assert.equal(disabled.passages.length, johnLesson.passages.length);
   assert.equal(disabled.passages.filter((passage) => passage.pilot).length, 0);
   assert.equal(disabled.passages.flatMap((passage) => passage.media ?? []).some((item) => item.featureFlag === 'john-media-pilot'), false);
-  assert.equal(disabled.passages.find((passage) => passage.id === 'john-2-cana')?.media?.length, 1);
+  assert.equal(disabled.passages.find((passage) => passage.id === 'john-2-cana')?.media?.length, 2);
 });
 
 test('YouTube clips use privacy-enhanced click-to-load URLs with captions and timestamps', () => {

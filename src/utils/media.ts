@@ -44,6 +44,9 @@ export function mediaDataErrors(media: PassageMedia): string[] {
     errors.push(`${media.id || 'Media'} needs source, link, creator, licence link, and attribution information.`);
   }
   if (media.type === 'image' && media.images.length === 0) errors.push(`${media.id} needs at least one image.`);
+  if (media.type === 'video' && (!media.video.src.trim() || !media.video.mimeType.trim())) {
+    errors.push(`${media.id} needs a video source and MIME type.`);
+  }
   if (media.type === 'youtube' && !/^[A-Za-z0-9_-]{11}$/.test(media.youtubeId)) {
     errors.push(`${media.id} has an invalid YouTube video id.`);
   }

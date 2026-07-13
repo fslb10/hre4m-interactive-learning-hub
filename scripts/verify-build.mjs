@@ -5,6 +5,29 @@ const repository = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? '';
 const base = process.env.GITHUB_ACTIONS && repository ? `/${repository}/` : '/';
 const dist = join(process.cwd(), 'dist');
 const failures = [];
+const canaMediaAssets = [
+  'media/cana-jars-observation.svg',
+  'media/cana-sign-motion.mp4',
+  'media/cana-sign-poster.png',
+];
+const sharedMotionAssets = [
+  'media/four-senses-motion.mp4',
+  'media/four-senses-poster.png',
+  'media/exegesis-eisegesis-motion.mp4',
+  'media/exegesis-eisegesis-poster.png',
+];
+const passageMotionAssets = [
+  'media/john4-recognition-motion.mp4',
+  'media/john4-recognition-poster.png',
+  'media/mark5-two-daughters-motion.mp4',
+  'media/mark5-two-daughters-poster.png',
+  'media/matthew13-four-soils-motion.mp4',
+  'media/matthew13-four-soils-poster.png',
+  'media/luke15-lost-sons-motion.mp4',
+  'media/luke15-lost-sons-poster.png',
+  'media/luke24-emmaus-motion.mp4',
+  'media/luke24-emmaus-poster.png',
+];
 const pilotMediaAssets = [
   'media/john1-word-light-hook.svg',
   'media/john1-prologue-pattern.svg',
@@ -29,7 +52,9 @@ for (const route of [
   'manifest.webmanifest',
   'sw.js',
   'app-icon.png',
-  'media/cana-jars-observation.svg',
+  ...canaMediaAssets,
+  ...sharedMotionAssets,
+  ...passageMotionAssets,
   ...pilotMediaAssets,
 ]) {
   requireFile(route);
@@ -38,8 +63,11 @@ for (const route of [
 const serviceWorkerPath = join(dist, 'sw.js');
 if (existsSync(serviceWorkerPath)) {
   const serviceWorker = readFileSync(serviceWorkerPath, 'utf8');
-  if (!serviceWorker.includes("'./media/cana-jars-observation.svg'")) {
-    failures.push('The demonstration media asset is not included in the offline app shell.');
+  for (const asset of canaMediaAssets) {
+    if (!serviceWorker.includes(`'./${asset}'`)) failures.push(`Cana media is missing from the offline app shell: ${asset}`);
+  }
+  for (const asset of sharedMotionAssets) {
+    if (!serviceWorker.includes(`'./${asset}'`)) failures.push(`Shared motion graphic is missing from the offline app shell: ${asset}`);
   }
   for (const asset of pilotMediaAssets) {
     if (!serviceWorker.includes(`'./${asset}'`)) failures.push(`Pilot media is missing from the offline app shell: ${asset}`);
