@@ -13,17 +13,17 @@
 <section aria-labelledby="passages-title">
   <div class="selector-heading">
     <div>
-      <p>Passage investigations</p>
-      <h2 id="passages-title">Choose your next case file</h2>
+      <p>Guided passages</p>
+      <h2 id="passages-title">Choose what to read next</h2>
     </div>
-    <p>Open the reference in your NRSV / NRSV-CE Bible before answering. Your response saves as you type.</p>
+    <p>Open the reference in your NRSV / NRSV-CE Bible. The hub will guide you through five short writing steps.</p>
   </div>
 
   <div class="passage-grid">
     {#each passages as passage, index}
       <button class:complete={passageComplete(responses[passage.id])} on:click={() => onSelect(passage.id)}>
         <span class="card-top">
-          <b>CASE {String(index + 1).padStart(2, '0')}</b>
+          <b>PASSAGE {String(index + 1).padStart(2, '0')}</b>
           <i class={difficultyClass(passage.difficulty)}>{passage.difficulty}</i>
         </span>
         <span class="passage-main">

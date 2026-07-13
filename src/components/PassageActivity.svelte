@@ -2,6 +2,7 @@
   import type { GospelPassage, SenseKey } from '../content/types';
   import type { PassageResponse } from '../utils/storage';
   import { EXIT_MIN, LITERAL_MIN, SENSE_MIN } from '../utils/progress';
+  import { protectStudentWriting } from '../utils/studentWriting';
   import PassageMedia from './PassageMedia.svelte';
   import PilotPassageActivity from './PilotPassageActivity.svelte';
 
@@ -30,16 +31,28 @@
   $: attemptedDeeper = [response.allegorical, response.moral, response.anagogical].some(
     (value) => value.trim().length >= 30,
   );
+  $: currentStep =
+    literalLength < LITERAL_MIN
+      ? { key: 'literal', number: 1, title: 'Explain what happens', help: 'Name the people, place, and main action. Add at least one detail from the passage.' }
+      : response.allegorical.trim().length < SENSE_MIN
+        ? { key: 'allegorical', number: 2, title: 'Connect the passage to Jesus', help: 'Explain what the passage shows about Jesus, salvation, the Church, or the sacraments.' }
+        : response.moral.trim().length < SENSE_MIN
+          ? { key: 'moral', number: 3, title: 'Name how people should live', help: 'Choose one attitude or action the passage asks people to practise.' }
+          : response.anagogical.trim().length < SENSE_MIN
+            ? { key: 'anagogical', number: 4, title: 'Look toward God’s Kingdom', help: 'Connect the passage to resurrection, eternal life, or God’s completed Kingdom.' }
+            : response.exit.trim().length < EXIT_MIN
+              ? { key: 'exit', number: 5, title: 'Write your main idea', help: 'In 2–3 sentences, explain one important thing the passage shows about Jesus.' }
+              : { key: 'complete', number: 5, title: 'Passage complete', help: 'Review your answers, or return to the passage list and choose the next reading.' };
 
   function update<K extends keyof PassageResponse>(field: K, value: PassageResponse[K]) {
     onChange({ ...response, [field]: value });
   }
 
   const evidenceChecks = [
-    { id: 'people-setting', label: 'I identified the people, setting, and central action.' },
-    { id: 'text-detail', label: 'I used at least one specific detail, image, or repeated word.' },
-    { id: 'gospel-context', label: 'I connected the passage to its place in this Gospel.' },
-    { id: 'observation-inference', label: 'I separated what the text shows from what I infer.' },
+    { id: 'people-setting', label: 'I named the main people, place, and action.' },
+    { id: 'text-detail', label: 'I used a detail, image, or repeated word from the text.' },
+    { id: 'gospel-context', label: 'I connected this passage to the rest of the Gospel.' },
+    { id: 'observation-inference', label: 'I made it clear which ideas come from the text.' },
   ];
 
   function toggleEvidence(id: string) {
@@ -53,7 +66,7 @@
 
   function requestExemplar() {
     if (!teacherMode && (!unlocked || !attemptedDeeper)) {
-      exemplarMessage = 'Ground your reading in context, then attempt at least one deeper sense before comparing.';
+      exemplarMessage = 'Finish Step 1 and try at least one deeper sense before opening the sample answers.';
       return;
     }
     exemplarMessage = '';
@@ -62,9 +75,9 @@
   }
 
   const senseMeta: Array<{ key: SenseKey; number: string; title: string; hint: string }> = [
-    { key: 'allegorical', number: '02', title: 'Allegorical', hint: 'Christ · salvation · Church · sacraments' },
-    { key: 'moral', number: '03', title: 'Moral', hint: 'Virtue · action · discipleship' },
-    { key: 'anagogical', number: '04', title: 'Anagogical', hint: 'Hope · resurrection · Kingdom fulfilled' },
+    { key: 'allegorical', number: '02', title: 'Allegorical', hint: 'What it shows about Jesus and salvation' },
+    { key: 'moral', number: '03', title: 'Moral', hint: 'How it asks people to live' },
+    { key: 'anagogical', number: '04', title: 'Anagogical', hint: 'How it points to eternal life and God’s Kingdom' },
   ];
 </script>
 
@@ -72,7 +85,7 @@
   <PilotPassageActivity {passage} {response} {teacherMode} {unlockRequired} {exemplarsEnabled} {onChange} {onBack} />
 {:else}
 <article class="case-file">
-  <button class="back-button" on:click={onBack}><span aria-hidden="true">←</span> Passage library</button>
+  <button class="back-button" on:click={onBack}><span aria-hidden="true">←</span> Back to all passages</button>
 
   <header class="case-header">
     <div class="case-labels">
@@ -84,35 +97,35 @@
     <blockquote>{passage.anchorPhrase}</blockquote>
     <div class="open-bible">
       <b aria-hidden="true">↗</b>
-      <span><strong>Open your Bible first</strong>Read {passage.reference} carefully in the NRSV / NRSV-CE before responding.</span>
+      <span><strong>Step 1: Open your Bible</strong>Read {passage.reference} in the NRSV / NRSV-CE. Read it once before you start writing.</span>
     </div>
   </header>
 
   <div class="evidence-grid">
     <section>
-      <p class="card-label">Context evidence</p>
+      <p class="card-label">Helpful context</p>
       <ul>
         {#each passage.contextNotes as note}<li>{note}</li>{/each}
       </ul>
     </section>
     <section>
-      <p class="card-label">Images to track</p>
+      <p class="card-label">Details to notice</p>
       <div class="image-chips">{#each passage.keyImages as image}<span>{image}</span>{/each}</div>
-      <p class="track-note">Where does each image appear, change, or create contrast?</p>
+      <p class="track-note">Find these details in the passage. Notice where they repeat or change.</p>
     </section>
   </div>
 
   <div class="insight-grid">
     <section class="connection-card">
       <span class="insight-icon" aria-hidden="true">✣</span>
-      <div><p>Catholic connection</p><h3>Faith seeking understanding</h3><span>{passage.catholicConnection}</span></div>
+      <div><p>Catholic connection</p><h3>Connect this to faith</h3><span>{passage.catholicConnection}</span></div>
     </section>
     <section class="trap-card">
       <span class="insight-icon" aria-hidden="true">!</span>
       <div>
-        <p>Common eisegesis trap</p>
-        <h3>Check the assumption</h3>
-        <button on:click={() => (showTrap = !showTrap)} aria-expanded={showTrap}>{showTrap ? 'Hide warning' : 'Reveal warning'}</button>
+        <p>Watch out for this mistake</p>
+        <h3>Check your idea</h3>
+        <button on:click={() => (showTrap = !showTrap)} aria-expanded={showTrap}>{showTrap ? 'Hide help' : 'Show help'}</button>
       </div>
       {#if showTrap}<span class="trap-copy">{passage.eisegesisTrap}</span>{/if}
     </section>
@@ -130,93 +143,104 @@
 
   <section class="response-lab" aria-labelledby="response-title">
     <div class="response-heading">
-      <div><p>Guided interpretation</p><h2 id="response-title">Build your reading in layers</h2></div>
+      <div><p>Your five writing steps</p><h2 id="response-title">Complete one step at a time</h2></div>
       <div class="step-dots" aria-label="Response progress">
-        <span class:done={response.literal.trim().length >= LITERAL_MIN}>1</span>
-        <span class:done={response.allegorical.trim().length >= SENSE_MIN}>2</span>
-        <span class:done={response.moral.trim().length >= SENSE_MIN}>3</span>
-        <span class:done={response.anagogical.trim().length >= SENSE_MIN}>4</span>
-        <span class:done={response.exit.trim().length >= EXIT_MIN}>5</span>
+        <span class:done={response.literal.trim().length >= LITERAL_MIN} aria-label="Step 1: what happens">1</span>
+        <span class:done={response.allegorical.trim().length >= SENSE_MIN} aria-label="Step 2: Jesus and salvation">2</span>
+        <span class:done={response.moral.trim().length >= SENSE_MIN} aria-label="Step 3: how to live">3</span>
+        <span class:done={response.anagogical.trim().length >= SENSE_MIN} aria-label="Step 4: eternal life and God’s Kingdom">4</span>
+        <span class:done={response.exit.trim().length >= EXIT_MIN} aria-label="Step 5: main idea">5</span>
       </div>
     </div>
 
-    <div class="response-card literal-card">
-      <div class="response-title"><b>01</b><span><strong>Literal / Context</strong><em>Begin with what the text communicates.</em></span></div>
+    <aside class:complete={currentStep.key === 'complete'} class="current-step" aria-live="polite">
+      <b>{currentStep.key === 'complete' ? '✓' : currentStep.number}</b>
+      <div><span>{currentStep.key === 'complete' ? 'Nice work' : `Do this now · Step ${currentStep.number} of 5`}</span><strong>{currentStep.title}</strong><p>{currentStep.help}</p></div>
+      {#if currentStep.key === 'complete'}<button on:click={onBack}>Choose the next passage</button>{/if}
+    </aside>
+
+    <p class="writing-rule">Write in your own words. Copy, cut, paste, and drag-and-drop are turned off in student writing boxes.</p>
+
+    <div class:active-step={currentStep.key === 'literal'} class="response-card literal-card">
+      <div class="response-title"><b>01</b><span><strong>Literal: What happens?</strong><em>Start with the passage, not your opinion.</em></span></div>
       <p>{passage.prompts.literal}</p>
       <textarea
+        use:protectStudentWriting
         value={response.literal}
         on:input={(event) => update('literal', event.currentTarget.value)}
         rows="7"
-        placeholder="Identify actions, people, setting, conflict, repeated language, and the passage’s role in this Gospel…"
+        placeholder="The main people are… The passage takes place… The main action is… One important detail is…"
         aria-label="Literal and context response"
       ></textarea>
       <div class="writing-status">
         <span>{literalLength} characters</span>
-        <span class:ready={unlocked}>{unlocked ? 'Context gate open' : `${Math.max(0, LITERAL_MIN - literalLength)} more to unlock`}</span>
+        <span class:ready={unlocked}>{unlocked ? '✓ Step 1 complete' : 'Write about 2–3 sentences'}</span>
       </div>
       <div class="evidence-checklist">
-        <div><strong>Evidence check</strong><span>{response.evidenceChecklist.length}/{evidenceChecks.length} checked</span></div>
+        <div><strong>Check your Step 1 answer</strong><span>{response.evidenceChecklist.length}/{evidenceChecks.length} checked</span></div>
         {#each evidenceChecks as item}
           <label><input type="checkbox" checked={response.evidenceChecklist.includes(item.id)} on:change={() => toggleEvidence(item.id)} /><span>{item.label}</span></label>
         {/each}
       </div>
       <div class="hint-ladder">
-        <div><strong>Need a nudge?</strong><span>Open hints one level at a time.</span></div>
+        <div><strong>Need help?</strong><span>Open one hint at a time.</span></div>
         <button on:click={() => update('hintLevel', Math.min(3, response.hintLevel + 1))} disabled={response.hintLevel >= 3}>{response.hintLevel ? 'Show next hint' : 'Show first hint'}</button>
-        {#if response.hintLevel >= 1}<p><b>Notice</b>Track the passage’s key images: {passage.keyImages.join(', ')}. Which one changes the meaning of the scene?</p>{/if}
-        {#if response.hintLevel >= 2}<p><b>Locate</b>Return to the beginning and ending. Who understands more, acts differently, or responds to Jesus?</p>{/if}
-        {#if response.hintLevel >= 3}<p><b>Start</b>“In {passage.reference}, the passage first shows ____. This matters in {passage.title} because ____.”</p>{/if}
+        {#if response.hintLevel >= 1}<p><b>Notice</b>Find these details: {passage.keyImages.join(', ')}. Choose one to include in your answer.</p>{/if}
+        {#if response.hintLevel >= 2}<p><b>Compare</b>Look at the start and end. Who changes, understands more, or responds to Jesus?</p>{/if}
+        {#if response.hintLevel >= 3}<p><b>Start</b>“In {passage.reference}, ____ happens. The detail ____ matters because ____.”</p>{/if}
       </div>
     </div>
 
     {#if !unlocked}
       <div class="locked-message">
         <span aria-hidden="true">⌁</span>
-        <div><strong>Deeper senses are waiting</strong><p>Write a meaningful literal/context response first. Spiritual interpretation grows from the text—it does not float above it.</p></div>
+        <div><strong>Finish Step 1 to continue</strong><p>Write 2–3 sentences about what happens. The other senses will unlock when your answer is long enough.</p></div>
       </div>
     {:else}
-      <div class="unlock-message" role="status"><span aria-hidden="true">✓</span>Good. Your reading is grounded in the text. Now move into the deeper senses.</div>
+      <div class="unlock-message" role="status"><span aria-hidden="true">✓</span>Step 1 is complete. Continue with the three deeper senses.</div>
     {/if}
 
     <div class="sense-grid" class:locked={!unlocked}>
       {#each senseMeta as sense}
-        <div class="response-card">
+        <div class:active-step={currentStep.key === sense.key} class="response-card">
           <div class="response-title"><b>{sense.number}</b><span><strong>{sense.title}</strong><em>{sense.hint}</em></span></div>
           <p>{passage.prompts[sense.key]}</p>
           <textarea
+            use:protectStudentWriting
             value={response[sense.key]}
             on:input={(event) => update(sense.key, event.currentTarget.value)}
             rows="6"
             disabled={!unlocked}
-            placeholder={`Develop the ${sense.title.toLowerCase()} sense with evidence from this passage…`}
+            placeholder={sense.key === 'allegorical' ? 'This passage shows us… about Jesus or salvation because…' : sense.key === 'moral' ? 'This passage asks people to… because…' : 'This passage points to eternal life or God’s Kingdom by…'}
             aria-label={`${sense.title} sense response`}
           ></textarea>
-          <span class="mini-count">{response[sense.key].trim().length} characters</span>
+          <span class:ready={response[sense.key].trim().length >= SENSE_MIN} class="mini-count">{response[sense.key].trim().length} characters · {response[sense.key].trim().length >= SENSE_MIN ? 'step complete' : 'write at least one full sentence'}</span>
         </div>
       {/each}
     </div>
 
-    <div class="response-card exit-card" class:locked={!unlocked}>
-      <div class="response-title"><b>05</b><span><strong>Exit check</strong><em>Make your central claim.</em></span></div>
+    <div class:active-step={currentStep.key === 'exit'} class="response-card exit-card" class:locked={!unlocked}>
+      <div class="response-title"><b>05</b><span><strong>Main idea</strong><em>Finish with what this passage shows about Jesus.</em></span></div>
       <p>{passage.prompts.exit}</p>
       <textarea
+        use:protectStudentWriting
         value={response.exit}
         on:input={(event) => update('exit', event.currentTarget.value)}
         rows="4"
         disabled={!unlocked}
-        placeholder="This passage reveals Jesus as…"
+        placeholder="This passage shows that Jesus… I know this because…"
         aria-label="Exit check response"
       ></textarea>
-      <span class="mini-count">{response.exit.trim().length} characters</span>
+      <span class:ready={response.exit.trim().length >= EXIT_MIN} class="mini-count">{response.exit.trim().length} characters · {response.exit.trim().length >= EXIT_MIN ? 'step complete' : 'write 2–3 sentences'}</span>
     </div>
 
     {#if exemplarsEnabled || teacherMode}<section class="exemplar-panel">
       <div>
-        <p>Compare after you attempt</p>
-        <h3>Exemplar responses</h3>
-        <span>These are models, not the only acceptable interpretations.</span>
+        <p>Use these after you try</p>
+        <h3>Sample answers</h3>
+        <span>Compare the samples with your own work. Your answer does not need to match exactly.</span>
       </div>
-      <button on:click={requestExemplar}>{showExemplar ? 'Hide exemplars' : 'Show exemplars'}</button>
+      <button on:click={requestExemplar}>{showExemplar ? 'Hide samples' : 'Show sample answers'}</button>
       {#if exemplarMessage}<p class="exemplar-message" role="status">{exemplarMessage}</p>{/if}
       {#if showExemplar}
         <div class="exemplar-grid">
@@ -225,9 +249,9 @@
           {/each}
         </div>
         <label class="exemplar-reflection">
-          <span>Reflect after comparing</span>
-          <p>What did the exemplar include that your response was missing, or what did your response emphasize differently?</p>
-          <textarea value={response.exemplarReflection} on:input={(event) => update('exemplarReflection', event.currentTarget.value)} rows="4" placeholder="One strength I noticed… One revision I would make…"></textarea>
+          <span>Compare and improve</span>
+          <p>Name one strength in your answer and one change that would make it clearer.</p>
+          <textarea use:protectStudentWriting value={response.exemplarReflection} on:input={(event) => update('exemplarReflection', event.currentTarget.value)} rows="4" placeholder="One strength in my answer is… One change I would make is…"></textarea>
         </label>
       {/if}
     </section>{/if}
@@ -275,7 +299,17 @@
   .step-dots { display: flex; gap: 6px; }
   .step-dots span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--lesson-border); border-radius: 50%; color: var(--lesson-muted); font-size: .68rem; }
   .step-dots span.done { border-color: var(--lesson-secondary); background: var(--lesson-secondary); color: var(--lesson-surface); }
+  .current-step { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 18px 20px; border: 2px solid var(--lesson-accent); border-radius: 16px; background: color-mix(in srgb, var(--lesson-accent) 9%, var(--lesson-surface)); }
+  .current-step > b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--lesson-primary); color: var(--lesson-accent); }
+  .current-step span, .current-step strong { display: block; }
+  .current-step span { color: var(--lesson-secondary); font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+  .current-step strong { margin-top: 2px; font-size: .98rem; }
+  .current-step p { margin: 4px 0 0; color: var(--lesson-muted); font-size: .78rem; line-height: 1.45; }
+  .current-step button { border: 0; border-radius: 999px; padding: 10px 14px; background: var(--lesson-primary); color: var(--lesson-surface); font-weight: 780; cursor: pointer; }
+  .current-step.complete { border-color: #69ad97; background: #e5f5ef; }
+  .writing-rule { margin: -4px 2px 2px; color: var(--lesson-muted); font-size: .72rem; line-height: 1.5; }
   .response-card { padding: clamp(21px, 4vw, 30px); border: 1px solid var(--lesson-border); border-radius: 18px; background: var(--lesson-surface); }
+  .response-card.active-step { border-color: var(--lesson-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lesson-accent) 12%, transparent); }
   .literal-card { border-top: 4px solid var(--lesson-accent); }
   .response-title { display: flex; gap: 13px; align-items: center; }
   .response-title > b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--lesson-primary); color: var(--lesson-accent); font: 400 .9rem Georgia, serif; }
@@ -285,6 +319,7 @@
   .response-card > p { color: var(--lesson-muted); line-height: 1.55; font-size: .86rem; }
   textarea { width: 100%; resize: vertical; padding: 15px; border: 1px solid var(--lesson-border); border-radius: 12px; background: color-mix(in srgb, var(--lesson-background) 60%, white); color: var(--lesson-text); line-height: 1.55; }
   textarea:focus { outline: 3px solid color-mix(in srgb, var(--lesson-accent) 20%, transparent); border-color: var(--lesson-accent); }
+  textarea[data-clipboard-blocked='true'] { outline: 3px solid #b84a55; border-color: #b84a55; }
   textarea:disabled { cursor: not-allowed; opacity: .48; }
   .writing-status { display: flex; justify-content: space-between; margin-top: 8px; color: var(--lesson-muted); font-size: .68rem; }
   .writing-status span:last-child { font-weight: 780; }
@@ -314,6 +349,7 @@
   .sense-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .sense-grid.locked, .exit-card.locked { opacity: .68; }
   .mini-count { display: block; margin-top: 7px; color: var(--lesson-muted); font-size: .66rem; text-align: right; }
+  .mini-count.ready { color: #18725d; font-weight: 780; }
   .exit-card { border-left: 4px solid var(--lesson-secondary); }
   .exemplar-panel { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; padding: 26px; border-radius: 18px; background: var(--lesson-primary); color: var(--lesson-surface); }
   .exemplar-panel h3 { margin: 0 0 5px; font: 400 1.65rem Georgia, serif; }
@@ -341,5 +377,7 @@
     .exemplar-panel > button { justify-self: start; }
     .exemplar-grid { grid-template-columns: 1fr; }
     .teacher-note { grid-template-columns: 1fr; }
+    .current-step { grid-template-columns: auto 1fr; }
+    .current-step button { grid-column: 1 / -1; justify-self: start; }
   }
 </style>

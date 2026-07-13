@@ -21,6 +21,11 @@ body {
 }
 
 button, input, select, textarea { font: inherit; }
+textarea[data-clipboard-blocked='true'] {
+  outline: 3px solid #b84a55 !important;
+  outline-offset: 2px;
+  border-color: #b84a55 !important;
+}
 a { color: inherit; }
 
 button, a { -webkit-tap-highlight-color: transparent; }

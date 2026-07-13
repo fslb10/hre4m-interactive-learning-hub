@@ -21,7 +21,7 @@
     type StudentInfo,
   } from '../utils/storage';
   import { buildStudentExport, exportFilename } from '../utils/exportText';
-  import { completionSummary, getBadges, passageComplete } from '../utils/progress';
+  import { completionSummary, getBadges, passageComplete, SYNTHESIS_MIN } from '../utils/progress';
   import { visiblePassageMedia } from '../utils/media';
   import { grantTeacherAccess, hasTeacherAccess } from '../utils/teacherAccess';
   import ExegesisQuiz from './ExegesisQuiz.svelte';
@@ -57,12 +57,12 @@
   let lastRecoveryAt = 0;
 
   const navItems: Array<{ id: View; icon: string; label: string; short: string }> = [
-    { id: 'overview', icon: '⌂', label: 'Gospel lens', short: 'Lens' },
-    { id: 'passages', icon: '◫', label: 'Passage library', short: 'Passages' },
-    { id: 'quiz', icon: '⌕', label: 'Exegesis check', short: 'Quiz' },
-    { id: 'sorter', icon: '✣', label: 'Four Senses sorter', short: 'Sorter' },
-    { id: 'synthesis', icon: '✎', label: 'Synthesis & reflection', short: 'Final' },
-    { id: 'collection', icon: '▤', label: 'Collection view', short: 'Report' },
+    { id: 'overview', icon: '⌂', label: 'Home and learning path', short: 'Home' },
+    { id: 'passages', icon: '◫', label: 'Guided passages', short: 'Passages' },
+    { id: 'quiz', icon: '⌕', label: 'Evidence quick check', short: 'Check 1' },
+    { id: 'sorter', icon: '✣', label: 'Four Senses match', short: 'Check 2' },
+    { id: 'synthesis', icon: '✎', label: 'Final writing', short: 'Final' },
+    { id: 'collection', icon: '▤', label: 'My saved work', short: 'My work' },
   ];
 
   const themeStyle = [
@@ -105,6 +105,51 @@
   $: badges = getBadges(effectiveLesson, state, loggedIn);
   $: activePassage = effectiveLesson.passages.find((passage) => passage.id === activePassageId);
   $: nextPassage = effectiveLesson.passages.find((passage) => !passageComplete(state.responses[passage.id])) ?? effectiveLesson.passages[0];
+  $: guideSteps = [
+    {
+      id: 'passages' as View,
+      number: 1,
+      title: 'Read and respond to each passage',
+      detail: `${summary.fullPassages} of ${effectiveLesson.passages.length} passages complete`,
+      done: summary.fullPassages === effectiveLesson.passages.length,
+      enabled: effectiveLesson.passages.length > 0,
+    },
+    {
+      id: 'quiz' as View,
+      number: 2,
+      title: 'Check if ideas come from the text',
+      detail: `${Object.keys(state.quizAnswers).length} of ${effectiveLesson.quiz.length} answered`,
+      done: effectiveLesson.quiz.every((item) => Boolean(state.quizAnswers[item.id])),
+      enabled: effectiveLesson.quiz.length > 0,
+    },
+    {
+      id: 'sorter' as View,
+      number: 3,
+      title: 'Match ideas to the Four Senses',
+      detail: `${Object.keys(state.sortAnswers).length} of ${effectiveLesson.sortingActivity.length} answered`,
+      done: effectiveLesson.sortingActivity.every((item) => Boolean(state.sortAnswers[item.id])),
+      enabled: effectiveLesson.sortingActivity.length > 0,
+    },
+    {
+      id: 'synthesis' as View,
+      number: 4,
+      title: 'Finish the final writing',
+      detail: 'Write one paragraph and one reflection',
+      done:
+        (!(effectiveLesson.requirements?.synthesis ?? true) || state.synthesis.trim().length >= SYNTHESIS_MIN) &&
+        (!(effectiveLesson.requirements?.reflection ?? true) || Boolean(state.reflectionChoice) && state.reflectionResponse.trim().length >= 100),
+      enabled: (effectiveLesson.requirements?.synthesis ?? true) || (effectiveLesson.requirements?.reflection ?? true),
+    },
+  ].filter((step) => step.enabled);
+  $: learningPathComplete = guideSteps.length > 0 && guideSteps.every((step) => step.done);
+  $: nextGuideStep = guideSteps.find((step) => !step.done) ?? {
+    id: 'collection' as View,
+    number: guideSteps.length + 1,
+    title: 'Review or export your work',
+    detail: 'Your learning path is complete',
+    done: true,
+    enabled: true,
+  };
 
   onMount(() => {
     assignment = parseAssignment(window.location.search, lesson);
@@ -190,6 +235,14 @@
     activePassageId = id;
     view = 'passages';
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goToGuideStep(target: View) {
+    if (target === 'passages' && nextPassage) {
+      openPassage(nextPassage.id);
+      return;
+    }
+    navigate(target);
   }
 
   function downloadWork() {
@@ -326,6 +379,14 @@
         </header>
 
         <main class="lesson-content">
+          {#if view !== 'overview'}
+            <aside class:complete={learningPathComplete} class="guide-strip" aria-label="Learning path guidance">
+              <span aria-hidden="true">{learningPathComplete ? '✓' : nextGuideStep.number}</span>
+              <div><small>{learningPathComplete ? 'Learning path complete' : 'Your next main step'}</small><strong>{nextGuideStep.title}</strong><p>{nextGuideStep.detail}</p></div>
+              <button on:click={() => navigate('overview')}>View my learning path</button>
+            </aside>
+          {/if}
+
           {#if view === 'overview'}
             {#if assignment}
               <section class="assignment-banner" aria-labelledby="assignment-title">
@@ -339,8 +400,8 @@
                 <h1 id="lesson-title">{lesson.title}</h1>
                 <span>{lesson.subtitle}</span>
                 <div class="landing-actions">
-                  <button class="primary-action" on:click={() => openPassage(nextPassage.id)}>{summary.literalPassages ? 'Continue investigation' : 'Begin first investigation'} <b>→</b></button>
-                  <button class="secondary-action" on:click={() => navigate('passages')}>Browse passages</button>
+                  <button class="primary-action" on:click={() => goToGuideStep(nextGuideStep.id)}>{learningPathComplete ? 'Review my work' : 'Continue my next step'} <b>→</b></button>
+                  <button class="secondary-action" on:click={() => navigate('passages')}>See all passages</button>
                 </div>
               </div>
               <div class="progress-medallion" style={`--progress:${summary.percentage * 3.6}deg`}>
@@ -356,10 +417,30 @@
               <div><small>Saved</small><strong>On this device</strong><span>{new Date(state.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span></div>
             </section>
 
+            <section class="learning-path" aria-labelledby="learning-path-title">
+              <div class="path-heading">
+                <div><p>Your step-by-step plan</p><h2 id="learning-path-title">What should I do next?</h2></div>
+                <span>{guideSteps.filter((step) => step.done).length}/{guideSteps.length} main steps complete</span>
+              </div>
+              <ol>
+                {#each guideSteps as step}
+                  <li class:done={step.done} class:current={!step.done && nextGuideStep.id === step.id}>
+                    <b>{step.done ? '✓' : step.number}</b>
+                    <div><strong>{step.title}</strong><span>{step.detail}</span></div>
+                    {#if !step.done && nextGuideStep.id === step.id}<em>Do this now</em>{/if}
+                  </li>
+                {/each}
+              </ol>
+              <div class="path-next">
+                <div><small>{learningPathComplete ? 'All steps finished' : `Next · Step ${nextGuideStep.number}`}</small><strong>{nextGuideStep.title}</strong><span>{nextGuideStep.detail}</span></div>
+                <button on:click={() => goToGuideStep(nextGuideStep.id)}>{learningPathComplete ? 'Open my saved work' : 'Go to this step'} <b aria-hidden="true">→</b></button>
+              </div>
+            </section>
+
             <UnitToolkit lens={lesson.gospelLens} gospelName={lesson.shortName} />
 
             <section class="badge-section" aria-labelledby="badge-title">
-              <div class="badge-heading"><div><p>Learning milestones</p><h2 id="badge-title">Badge cabinet</h2></div><span>{badges.filter((badge) => badge.earned).length}/{badges.length} earned</span></div>
+              <div class="badge-heading"><div><p>Your progress</p><h2 id="badge-title">Learning badges</h2></div><span>{badges.filter((badge) => badge.earned).length}/{badges.length} earned</span></div>
               <div class="badge-grid">
                 {#each badges as badge}
                   <article class:earned={badge.earned}>
@@ -498,6 +579,14 @@
   .assignment-banner small, .assignment-banner strong { display: block; }
   .assignment-banner small { color: var(--lesson-muted); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; }
   .assignment-banner strong { margin-top: 5px; font-size: .78rem; }
+  .guide-strip { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; margin-bottom: 20px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--lesson-accent) 52%, var(--lesson-border)); border-radius: 14px; background: color-mix(in srgb, var(--lesson-accent) 9%, var(--lesson-surface)); }
+  .guide-strip > span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--lesson-primary); color: var(--lesson-accent); font-weight: 850; }
+  .guide-strip small, .guide-strip strong, .guide-strip p { display: block; }
+  .guide-strip small { color: var(--lesson-secondary); font-size: .58rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+  .guide-strip strong { margin-top: 2px; font-size: .82rem; }
+  .guide-strip p { margin: 2px 0 0; color: var(--lesson-muted); font-size: .66rem; }
+  .guide-strip button { border: 0; border-bottom: 1px solid currentColor; padding: 4px 0; background: none; color: var(--lesson-secondary); font-size: .68rem; font-weight: 780; cursor: pointer; }
+  .guide-strip.complete { border-color: #7ab6a4; background: #e5f5ef; }
   .lesson-landing { min-height: 480px; display: grid; grid-template-columns: 1.35fr .65fr; align-items: center; gap: 50px; padding: clamp(34px, 6vw, 68px); border-radius: 28px; background: var(--lesson-primary); color: var(--lesson-surface); overflow: hidden; position: relative; }
   .lesson-landing::before { content: ''; position: absolute; width: 470px; height: 470px; border: 1px solid color-mix(in srgb, var(--lesson-accent) 45%, transparent); border-radius: 50%; right: -210px; top: -260px; box-shadow: 0 0 0 70px color-mix(in srgb, var(--lesson-accent) 5%, transparent); }
   .landing-copy { position: relative; z-index: 1; }
@@ -516,13 +605,36 @@
   .progress-medallion strong { font: 400 clamp(2.4rem, 5vw, 4rem) Georgia, serif; }
   .progress-medallion span { color: color-mix(in srgb, var(--lesson-surface) 60%, transparent); font-size: .62rem; text-transform: uppercase; letter-spacing: .12em; }
   .progress-medallion small { position: absolute; z-index: 1; right: -17px; bottom: 11%; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--lesson-accent); color: var(--lesson-primary); text-align: center; font-size: .58rem; font-weight: 800; }
-  .student-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); margin: 16px 0 70px; border: 1px solid var(--lesson-border); border-radius: 16px; background: var(--lesson-surface); overflow: hidden; }
+  .student-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); margin: 16px 0 24px; border: 1px solid var(--lesson-border); border-radius: 16px; background: var(--lesson-surface); overflow: hidden; }
   .student-dashboard > div { padding: 18px; border-right: 1px solid var(--lesson-border); }
   .student-dashboard > div:last-child { border-right: 0; }
   .student-dashboard small, .student-dashboard strong, .student-dashboard span { display: block; }
   .student-dashboard small { color: var(--lesson-muted); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; }
   .student-dashboard strong { margin: 8px 0 4px; font: 400 1.2rem Georgia, serif; }
   .student-dashboard span { color: var(--lesson-muted); font-size: .66rem; }
+  .learning-path { margin-bottom: 70px; padding: clamp(22px, 4vw, 34px); border: 1px solid var(--lesson-border); border-radius: 20px; background: var(--lesson-surface); }
+  .path-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 22px; }
+  .path-heading p { margin: 0 0 7px; color: var(--lesson-secondary); font-size: .64rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+  .path-heading h2 { margin: 0; font: 400 clamp(2rem, 4vw, 3rem)/1 Georgia, serif; }
+  .path-heading > span { color: var(--lesson-muted); font-size: .7rem; }
+  .learning-path ol { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .learning-path li { position: relative; min-height: 128px; display: grid; grid-template-columns: auto 1fr; align-content: start; gap: 10px; padding: 15px; border: 1px solid var(--lesson-border); border-radius: 13px; background: var(--lesson-background); }
+  .learning-path li > b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--lesson-border); color: var(--lesson-muted); font-size: .72rem; }
+  .learning-path li strong, .learning-path li span { display: block; }
+  .learning-path li strong { font-size: .77rem; line-height: 1.35; }
+  .learning-path li span { margin-top: 5px; color: var(--lesson-muted); font-size: .64rem; line-height: 1.4; }
+  .learning-path li em { grid-column: 1 / -1; align-self: end; color: var(--lesson-secondary); font-size: .59rem; font-style: normal; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+  .learning-path li.done { background: #edf7f3; border-color: #9bc8ba; }
+  .learning-path li.done > b { background: #2b806b; color: white; }
+  .learning-path li.current { border: 2px solid var(--lesson-accent); background: color-mix(in srgb, var(--lesson-accent) 8%, var(--lesson-surface)); }
+  .learning-path li.current > b { background: var(--lesson-primary); color: var(--lesson-accent); }
+  .path-next { display: flex; align-items: center; justify-content: space-between; gap: 25px; margin-top: 14px; padding: 18px; border-radius: 13px; background: var(--lesson-primary); color: var(--lesson-surface); }
+  .path-next small, .path-next strong, .path-next span { display: block; }
+  .path-next small { color: var(--lesson-accent); font-size: .6rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+  .path-next strong { margin-top: 3px; font-size: .9rem; }
+  .path-next span { margin-top: 3px; color: color-mix(in srgb, var(--lesson-surface) 68%, transparent); font-size: .67rem; }
+  .path-next button { flex: 0 0 auto; border: 0; border-radius: 999px; padding: 11px 14px; background: var(--lesson-accent); color: var(--lesson-primary); font-size: .7rem; font-weight: 820; cursor: pointer; }
+  .path-next button b { margin-left: 10px; }
   .badge-section { margin-top: 70px; }
   .badge-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 20px; }
   .badge-heading p { margin: 0 0 8px; color: var(--lesson-secondary); font-size: .66rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
@@ -563,6 +675,7 @@
     .scrim { display: block; position: fixed; inset: 0; z-index: 40; border: 0; background: rgba(0,0,0,.38); }
     .menu-button { display: block; }
     .badge-grid { grid-template-columns: repeat(2, 1fr); }
+    .learning-path ol { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 760px) {
     .topbar { padding: 0 15px; min-height: 62px; }
@@ -582,12 +695,18 @@
     .data-controls > div:last-child { margin-top: 16px; flex-wrap: wrap; }
     .assignment-banner { display: block; }
     .assignment-banner > div:last-child { margin-top: 14px; padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--lesson-border); }
+    .guide-strip { grid-template-columns: auto 1fr; }
+    .guide-strip button { grid-column: 1 / -1; justify-self: start; }
   }
   @media (max-width: 520px) {
     .student-menu > span:not(.student-avatar) { display: none; }
     .badge-grid { grid-template-columns: 1fr; }
     .student-dashboard { grid-template-columns: 1fr; }
     .student-dashboard > div { border-right: 0; }
+    .path-heading, .path-next { display: block; }
+    .path-heading > span { display: block; margin-top: 8px; }
+    .learning-path ol { grid-template-columns: 1fr; }
+    .path-next button { margin-top: 14px; }
   }
   @media print {
     .sidebar, .topbar, .mobile-nav, .no-print, .toast { display: none !important; }

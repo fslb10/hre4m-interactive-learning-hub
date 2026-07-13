@@ -25,13 +25,13 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   <main id="main-content">
     <section class="hub-hero" aria-labelledby="hub-title">
       <div class="hero-copy">
-        <p class="eyebrow">Unit 2 is now open</p>
-        <h1 id="hub-title">Read closely.<br /><em>Think deeply.</em></h1>
+        <p class="eyebrow">Start Unit 2</p>
+        <h1 id="hub-title">Read the text.<br /><em>Build your answer.</em></h1>
         <p class="hero-lede">
-          A Scripture lab for learning exegesis and the Four Senses through the distinct voices of
-          Matthew, Mark, Luke, and John.
+          Learn how to understand Scripture step by step. Choose Matthew, Mark, Luke, or John,
+          then follow the prompts and write in your own words.
         </p>
-        <a class="primary-link" href="#gospel-labs">Choose a Gospel <span aria-hidden="true">↓</span></a>
+        <a class="primary-link" href="#gospel-labs">Start by choosing a Gospel <span aria-hidden="true">↓</span></a>
       </div>
       <div class="hero-orbit" aria-hidden="true">
         <span class="orbit-label">UNIT</span>
@@ -45,25 +45,25 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     <section class="unit-overview" aria-label="Unit 2 overview">
       <div>
         <span class="overview-number">01</span>
-        <p><strong>Begin with the text</strong><br />Author · audience · genre · context</p>
+        <p><strong>Read what is there</strong><br />Who · what · where · key details</p>
       </div>
       <div>
         <span class="overview-number">02</span>
-        <p><strong>Interpret with care</strong><br />Exegesis before application</p>
+        <p><strong>Explain the meaning</strong><br />Use evidence before opinions</p>
       </div>
       <div>
         <span class="overview-number">03</span>
-        <p><strong>Read four ways</strong><br />Literal · allegorical · moral · anagogical</p>
+        <p><strong>Use the Four Senses</strong><br />The hub explains each one as you go</p>
       </div>
     </section>
 
     <section class="labs-section" id="gospel-labs" aria-labelledby="labs-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Four distinct lenses</p>
-          <h2 id="labs-title">Choose your Gospel laboratory</h2>
+          <p class="eyebrow">Your first step</p>
+          <h2 id="labs-title">Choose a Gospel</h2>
         </div>
-        <p>Each lab uses the same learning structure with a visual language shaped by its Gospel.</p>
+        <p>Each Gospel follows the same guided steps. Your work saves on this device as you type.</p>
       </div>
 
       <div class="gospel-grid">
@@ -80,9 +80,9 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
             <div>
               <p>{lesson.theme.motif}</p>
               <h3>{lesson.shortName}</h3>
-              <span>{lesson.passages.length} passage investigations · local autosave</span>
+              <span>{lesson.passages.length} guided passages · saves on this device</span>
             </div>
-            <span class="card-action">Enter lab <b aria-hidden="true">↗</b></span>
+            <span class="card-action">Start this Gospel <b aria-hidden="true">→</b></span>
           </a>
         ))}
       </div>

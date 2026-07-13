@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { protectStudentWriting } from '../utils/studentWriting';
+
   export let gospelName: string;
   export let synthesis = '';
   export let reflectionChoice = '';
@@ -11,9 +13,9 @@
 
   const choices = [
     { id: 'Prayer', icon: '✦', title: 'Write a prayer', prompt: 'Write a short prayer inspired by one passage.' },
-    { id: 'Symbol Map', icon: '◎', title: 'Create a symbol map', prompt: 'Describe a visual map connecting one symbol to the Four Senses.' },
+    { id: 'Symbol Map', icon: '◎', title: 'Create a symbol map', prompt: 'Explain how one symbol connects to the Four Senses.' },
     { id: 'Teach Grade 9', icon: '↗', title: 'Teach it forward', prompt: 'Explain one passage clearly to a Grade 9 student.' },
-    { id: 'Modern Moral Issue', icon: '⚖', title: 'Connect a moral issue', prompt: 'Connect one passage to a current moral or social issue.' },
+    { id: 'Modern Moral Issue', icon: '⚖', title: 'Connect a real issue', prompt: 'Connect one passage to a moral or social issue today.' },
     { id: 'Compare Images', icon: '◫', title: 'Compare two images', prompt: 'Compare two images of Jesus within this Gospel.' },
     { id: 'Discipleship', icon: '➜', title: 'Name the next step', prompt: 'Explain how one passage reshapes Christian discipleship.' },
   ];
@@ -24,36 +26,37 @@
 <div class="final-shell">
   {#if showSynthesis}<section class="synthesis" aria-labelledby="synthesis-title">
     <div class="section-intro">
-      <p>Final task 01</p>
-      <h2 id="synthesis-title">Write a mini-exegesis</h2>
-      <span>Choose one {gospelName} passage and bring the four interpretive layers into one clear, evidence-based paragraph.</span>
+      <p>Final writing · Step 1</p>
+      <h2 id="synthesis-title">Explain one passage</h2>
+      <span>Choose one {gospelName} passage. Write one paragraph that uses evidence and all Four Senses.</span>
     </div>
     <div class="prompt-card">
-      <h3>Your paragraph should explain</h3>
+      <h3>Use this checklist</h3>
       <ol>
-        <li><b>01</b>the literal meaning in context</li>
-        <li><b>02</b>one important image or symbol</li>
-        <li><b>03</b>one deeper meaning in Christ</li>
-        <li><b>04</b>one moral application</li>
-        <li><b>05</b>one connection to eternal life or the Kingdom</li>
+        <li><b>01</b>Explain what happens in the passage.</li>
+        <li><b>02</b>Use one important detail or symbol.</li>
+        <li><b>03</b>Explain what it shows about Jesus.</li>
+        <li><b>04</b>Explain how people should live.</li>
+        <li><b>05</b>Connect it to eternal life or God’s Kingdom.</li>
       </ol>
       <details>
-        <summary>Use a sentence starter</summary>
-        <p>In [reference], the literal sense is ____. The passage uses ____ to reveal ____. Allegorically, this points to ____. Morally, it calls us to ____. Anagogically, it reminds us that ____.</p>
+        <summary>Need help starting? Open this sentence frame</summary>
+        <p>In [reference], ____ happens. The detail ____ is important because ____. This shows us ____ about Jesus. It calls people to ____. It also points to God’s Kingdom because ____.</p>
       </details>
     </div>
     <label>
-      <span>Final synthesis</span>
-      <textarea value={synthesis} on:input={(event) => onSynthesis(event.currentTarget.value)} rows="11" placeholder="Build your mini-exegesis here…"></textarea>
-      <small class:ready={synthesis.trim().length >= 180}>{synthesis.trim().length} characters {synthesis.trim().length >= 180 ? '· synthesis complete' : '· aim for at least 180'}</small>
+      <span>Your paragraph</span>
+      <textarea use:protectStudentWriting value={synthesis} on:input={(event) => onSynthesis(event.currentTarget.value)} rows="11" placeholder="Write your paragraph here in your own words…"></textarea>
+      <small class:ready={synthesis.trim().length >= 180}>{synthesis.trim().length} characters {synthesis.trim().length >= 180 ? '· step complete' : '· write about 4–6 sentences'}</small>
+      <small class="writing-rule">Type your own response. Copy, cut, paste, and drag-and-drop are turned off in student writing boxes.</small>
     </label>
   </section>{/if}
 
   {#if showReflection}<section class="choice-board" aria-labelledby="choice-title">
     <div class="section-intro">
-      <p>Final task 02</p>
-      <h2 id="choice-title">Choose your reflection route</h2>
-      <span>Show your learning in a form that fits the connection you want to make.</span>
+      <p>Final writing · Step 2</p>
+      <h2 id="choice-title">Choose one reflection</h2>
+      <span>Pick the option that helps you explain your learning most clearly.</span>
     </div>
     <div class="choices">
       {#each choices as choice}
@@ -66,8 +69,8 @@
       <label class="reflection-box">
         <span>{selected.title}</span>
         <p>{selected.prompt}</p>
-        <textarea value={reflectionResponse} on:input={(event) => onReflectionResponse(event.currentTarget.value)} rows="8" placeholder="Complete your chosen reflection…"></textarea>
-        <small class:ready={reflectionResponse.trim().length >= 100}>{reflectionResponse.trim().length} characters {reflectionResponse.trim().length >= 100 ? '· reflection complete' : '· aim for at least 100'}</small>
+        <textarea use:protectStudentWriting value={reflectionResponse} on:input={(event) => onReflectionResponse(event.currentTarget.value)} rows="8" placeholder="Write your reflection here in your own words…"></textarea>
+        <small class:ready={reflectionResponse.trim().length >= 100}>{reflectionResponse.trim().length} characters {reflectionResponse.trim().length >= 100 ? '· step complete' : '· write about 3–4 sentences'}</small>
       </label>
     {/if}
   </section>{/if}
@@ -94,6 +97,7 @@
   textarea:focus { outline: 3px solid color-mix(in srgb, var(--lesson-accent) 20%, transparent); border-color: var(--lesson-accent); }
   label small { color: var(--lesson-muted); font-size: .68rem; text-align: right; }
   label small.ready { color: #18725d; font-weight: 780; }
+  label small.writing-rule { text-align: left; color: var(--lesson-muted); }
   .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
   .choices button { min-height: 175px; display: flex; flex-direction: column; align-items: start; text-align: left; gap: 8px; padding: 20px; border: 1px solid var(--lesson-border); border-radius: 16px; background: var(--lesson-surface); color: var(--lesson-text); cursor: pointer; }
   .choices button:hover, .choices button.selected { border-color: var(--lesson-accent); background: color-mix(in srgb, var(--lesson-accent) 8%, var(--lesson-surface)); }

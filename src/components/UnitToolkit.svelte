@@ -8,41 +8,41 @@
 <section class="toolkit" aria-labelledby="toolkit-title">
   <div class="toolkit-hero">
     <div>
-      <p class="section-kicker">Before you interpret</p>
-      <h2 id="toolkit-title">Your Unit 2 field kit</h2>
+      <p class="section-kicker">Words you need to know</p>
+      <h2 id="toolkit-title">A simple guide to reading Scripture</h2>
     </div>
-    <p>Strong spiritual reading begins with close attention to what the text actually communicates.</p>
+    <p>Start with what the passage says. Then use evidence from the text to explain its deeper meaning.</p>
   </div>
 
   <div class="method-grid">
     <article>
       <span class="method-number">01</span>
       <h3>Hermeneutics</h3>
-      <p>The study and practice of interpretation—the choices and principles readers bring to meaning.</p>
+      <p>The way we interpret a text. It includes the questions and methods we use to understand meaning.</p>
     </article>
     <article>
       <span class="method-number">02</span>
       <h3>Exegesis</h3>
-      <p>Drawing meaning from the text by attending to context, author, audience, genre, structure, and message.</p>
+      <p>Building an interpretation from evidence in the passage and its original context.</p>
     </article>
     <article class="warning-card">
       <span class="method-number">03</span>
       <h3>Eisegesis</h3>
-      <p>Reading an opinion or assumption into the text without sufficient evidence from the passage.</p>
+      <p>Putting your own idea into a passage when the text does not support it.</p>
     </article>
   </div>
 
   <div class="senses-panel">
     <div class="senses-intro">
-      <p class="section-kicker">One text · Four connected questions</p>
-      <h3>The Four Senses</h3>
-      <p>The spiritual senses deepen the literal sense; they do not replace it.</p>
+      <p class="section-kicker">One passage · Four questions</p>
+      <h3>The Four Senses, made simple</h3>
+      <p>Always answer the literal question first. The other three questions build from it.</p>
     </div>
     <ol>
-      <li><b>L</b><span><strong>Literal</strong>What does the text communicate in context?</span></li>
-      <li><b>A</b><span><strong>Allegorical</strong>How does it reveal Christ and salvation?</span></li>
-      <li><b>M</b><span><strong>Moral</strong>How should God’s people live?</span></li>
-      <li><b>A</b><span><strong>Anagogical</strong>Where is God leading creation?</span></li>
+      <li><b>L</b><span><strong>Literal</strong>What happens in the passage?</span></li>
+      <li><b>A</b><span><strong>Allegorical</strong>What does it show about Jesus and salvation?</span></li>
+      <li><b>M</b><span><strong>Moral</strong>How should people live?</span></li>
+      <li><b>A</b><span><strong>Anagogical</strong>How does it point to eternal life or God’s Kingdom?</span></li>
     </ol>
   </div>
 

@@ -12,9 +12,9 @@
 <section class="quiz-shell" aria-labelledby="quiz-title">
   <header>
     <div>
-      <p>Interactive check 01</p>
-      <h2 id="quiz-title">Text evidence or reader projection?</h2>
-      <span>Choose exegesis when the claim grows from the passage. Choose eisegesis when it imports an unsupported assumption.</span>
+      <p>Quick check · Step 1</p>
+      <h2 id="quiz-title">Does the idea come from the text?</h2>
+      <span>Choose <b>exegesis</b> when the passage supports the idea. Choose <b>eisegesis</b> when someone adds an idea the passage does not support.</span>
     </div>
     <div class="score"><strong>{correct}</strong><span>/{items.length}<br />correct</span></div>
   </header>
@@ -45,7 +45,7 @@
           </div>
           {#if answers[item.id]}
             <div class="feedback" role="status">
-              <b>{answers[item.id] === item.answer ? '✓ Correct' : `Try again · This is ${item.answer}`}</b>
+              <b>{answers[item.id] === item.answer ? '✓ Correct' : `Not yet · Try ${item.answer}`}</b>
               <span>{item.feedback}</span>
             </div>
           {/if}

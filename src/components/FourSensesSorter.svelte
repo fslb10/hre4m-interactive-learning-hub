@@ -12,18 +12,18 @@
 <section class="sorter" aria-labelledby="sorter-title">
   <header>
     <div>
-      <p>Interactive check 02</p>
-      <h2 id="sorter-title">Four Senses sorter</h2>
-      <span>Read each interpretation and assign its best-fit sense. Click-to-sort works with keyboard, touch, or mouse.</span>
+      <p>Quick check · Step 2</p>
+      <h2 id="sorter-title">Match each idea to a sense</h2>
+      <span>Read each idea. Then choose the Four Sense that fits it best. You can change an answer and try again.</span>
     </div>
     <div class="score"><strong>{correct}</strong><span>of {items.length}<br />matched</span></div>
   </header>
 
   <div class="sense-key" aria-label="Sense reminder">
-    <span><b>L</b> Text in context</span>
-    <span><b>A</b> Christ & salvation</span>
-    <span><b>M</b> Faithful action</span>
-    <span><b>A</b> Fulfilled Kingdom</span>
+    <span><b>L</b> Literal: what happens</span>
+    <span><b>A</b> Allegorical: Jesus and salvation</span>
+    <span><b>M</b> Moral: how to live</span>
+    <span><b>A</b> Anagogical: eternal life and the Kingdom</span>
   </div>
 
   <div class="sort-list">
@@ -37,7 +37,7 @@
         </div>
         {#if answers[item.id]}
           <p class="feedback" role="status">
-            {answers[item.id] === item.answer ? `✓ ${item.answer} fits the focus of this interpretation.` : `Look again: this interpretation is ${item.answer}.`}
+            {answers[item.id] === item.answer ? `✓ Correct. This idea is ${item.answer}.` : `Not yet. Look for the clue that makes this ${item.answer}.`}
           </p>
         {/if}
       </article>

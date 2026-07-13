@@ -19,7 +19,7 @@
 
   function submit() {
     if (!lastName.trim() || !firstName.trim() || !period) {
-      error = 'Complete all three fields to enter the lesson.';
+      error = 'Enter your first name, last name, and class period.';
       return;
     }
 
@@ -41,8 +41,8 @@
     </div>
 
     <div class="login-intro">
-      <p>Student entry</p>
-      <h1 id="login-title">Ready to read<br />beneath the surface?</h1>
+      <p>Before you begin</p>
+      <h1 id="login-title">Tell us who<br />is doing the work.</h1>
       <span>{lessonName}</span>
     </div>
 
@@ -69,12 +69,12 @@
 
       {#if error}<p class="form-error" role="alert">{error}</p>{/if}
 
-      <button type="submit">Enter the Gospel lab <span aria-hidden="true">→</span></button>
+      <button type="submit">Start the lesson <span aria-hidden="true">→</span></button>
     </form>
 
     <p class="privacy-note">
       <span aria-hidden="true">◌</span>
-      Your work saves only in this browser. This is a classroom information gate, not an online account.
+      Your work saves only on this device. This does not create an online account.
     </p>
   </section>
 </div>

@@ -3,9 +3,9 @@ import { definePassage, type GospelLesson } from '../types.ts';
 export const lukeLesson: GospelLesson = {
   id: 'gospel-luke',
   shortName: 'Luke',
-  title: 'Gospel of Luke: Mercy on the Road',
-  eyebrow: 'Unit 2 · Encounters of Mercy',
-  subtitle: 'Read Luke’s ordered account by following prayer, reversal, table fellowship, and joy for outsiders.',
+  title: 'Luke: Mercy for Every Person',
+  eyebrow: 'Unit 2 · Gospel of Luke',
+  subtitle: 'Follow Luke’s stories about mercy, prayer, shared meals, and people who are often left out.',
   symbol: '◡',
   theme: {
     name: 'Mercy Journal',
@@ -22,10 +22,10 @@ export const lukeLesson: GospelLesson = {
     },
   },
   gospelLens: [
-    'Notice people at the edges: the poor, outsiders, women, sinners, the sick, and social enemies.',
-    'Track prayer and the Holy Spirit at important turning points.',
-    'Watch what happens at meals, where welcome, status, forgiveness, and mission are revealed.',
-    'Look for reversals in which the lowly are raised and the secure are challenged to conversion.',
+    'Notice people who are often left out: the poor, outsiders, women, sinners, and the sick.',
+    'Track prayer and the Holy Spirit when the story changes direction.',
+    'Watch what happens at meals, especially welcome, forgiveness, and who belongs.',
+    'Look for moments when people with little power are lifted up and others are asked to change.',
   ],
   passages: [
     definePassage({

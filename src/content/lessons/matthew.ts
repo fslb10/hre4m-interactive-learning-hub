@@ -3,9 +3,9 @@ import { definePassage, type GospelLesson } from '../types.ts';
 export const matthewLesson: GospelLesson = {
   id: 'gospel-matthew',
   shortName: 'Matthew',
-  title: 'Gospel of Matthew: Kingdom & Fulfillment',
-  eyebrow: 'Unit 2 · Kingdom Learning Studio',
-  subtitle: 'Read Matthew as a carefully structured teaching Gospel where promise becomes mission.',
+  title: 'Matthew: Jesus Teaches About God’s Kingdom',
+  eyebrow: 'Unit 2 · Gospel of Matthew',
+  subtitle: 'Follow Matthew’s clear teaching about Jesus, God’s promises, and the mission of his followers.',
   symbol: '♛',
   theme: {
     name: 'Royal Archive',
@@ -22,10 +22,10 @@ export const matthewLesson: GospelLesson = {
     },
   },
   gospelLens: [
-    'Watch how Matthew connects Jesus with Israel’s Scriptures and story.',
-    'Notice the Kingdom of Heaven as God’s active reign, not merely a place after death.',
-    'Attend to Jesus as teacher: his words form a community of faithful practice.',
-    'Track Emmanuel—from “God with us” at the beginning to Christ’s presence in mission at the end.',
+    'Notice how Matthew connects Jesus to Israel’s Scriptures and story.',
+    'Remember that the Kingdom of Heaven also means God acting in the world now.',
+    'Watch how Jesus teaches people to live as a faithful community.',
+    'Track “God with us” from the beginning of Matthew to the final mission.',
   ],
   passages: [
     definePassage({

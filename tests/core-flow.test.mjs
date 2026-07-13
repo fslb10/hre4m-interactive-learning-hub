@@ -26,6 +26,7 @@ import { markLesson } from '../src/content/lessons/mark.ts';
 import { matthewLesson } from '../src/content/lessons/matthew.ts';
 import { lukeLesson } from '../src/content/lessons/luke.ts';
 import { applyLessonFeatureFlags } from '../src/utils/features.ts';
+import { shouldBlockStudentWritingEvent } from '../src/utils/studentWriting.ts';
 
 const lesson = {
   id: 'gospel-john',
@@ -47,6 +48,16 @@ const completeResponse = {
   hintLevel: 0,
   mediaResponses: {},
 };
+
+test('student writing blocks clipboard and drag-in text while allowing normal typing', () => {
+  for (const eventType of ['copy', 'cut', 'paste', 'drop']) {
+    assert.equal(shouldBlockStudentWritingEvent(eventType), true);
+  }
+  assert.equal(shouldBlockStudentWritingEvent('beforeinput', 'insertFromPaste'), true);
+  assert.equal(shouldBlockStudentWritingEvent('beforeinput', 'insertFromDrop'), true);
+  assert.equal(shouldBlockStudentWritingEvent('beforeinput', 'insertText'), false);
+  assert.equal(shouldBlockStudentWritingEvent('input'), false);
+});
 
 test('assignment links preserve only valid required passages and settings', () => {
   const parsed = parseAssignment(

@@ -15,9 +15,9 @@
   export let mode: 'default' | 'hook' | 'study' = 'default';
 
   const headings = {
-    default: { eyebrow: 'Media studio', title: 'Look, listen, then return to the text', note: 'Each item has a specific learning purpose. Your checkpoint notes autosave with this passage.' },
-    hook: { eyebrow: 'Visual hook', title: 'Begin with careful noticing', note: 'Pause before explaining. Record what the visual makes you notice, then open the text.' },
-    study: { eyebrow: 'Interpretive media', title: 'Test your first reading', note: 'Use the media to notice structure and contrast, then verify every interpretation against the passage.' },
+    default: { eyebrow: 'Optional media', title: 'Look or listen, then check the text', note: 'Answer the short questions as you go. Your notes save with this passage.' },
+    hook: { eyebrow: 'Start by noticing', title: 'What do you see first?', note: 'Write what you notice before you explain what it means. Then open the passage.' },
+    study: { eyebrow: 'Check your thinking', title: 'Compare the media with the passage', note: 'Use the media to notice patterns. Check every idea against the words in the passage.' },
   };
 
   $: heading = headings[mode];
@@ -45,7 +45,7 @@
           <YouTubeClip {item} />
         {/if}
         <details class="text-alternative">
-          <summary>Text alternative / low-bandwidth route</summary>
+          <summary>Read a text version instead</summary>
           <p>{item.textAlternative}</p>
         </details>
         <MediaCheckpoint mediaId={item.id} stage="after" questions={item.afterViewing ?? []} {responses} {onResponse} />

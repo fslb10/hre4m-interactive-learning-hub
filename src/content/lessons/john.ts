@@ -12,9 +12,9 @@ const pilotCredit = (title: string, sourceUrl: string): MediaCredit => ({
 export const johnLesson: GospelLesson = {
   id: 'gospel-john',
   shortName: 'John',
-  title: 'Gospel of John: Signs, Glory & Life',
-  eyebrow: 'Unit 2 · Scripture Laboratory',
-  subtitle: 'Read beneath the surface. Follow John’s signs and symbols toward the identity of Jesus.',
+  title: 'John: Signs That Show Who Jesus Is',
+  eyebrow: 'Unit 2 · Gospel of John',
+  subtitle: 'Follow John’s signs, symbols, and contrasts to understand what this Gospel says about Jesus.',
   symbol: '✦',
   theme: {
     name: 'Luminous Manuscript',
@@ -31,10 +31,10 @@ export const johnLesson: GospelLesson = {
     },
   },
   gospelLens: [
-    'Notice signs that reveal who Jesus is rather than treating them as spectacle.',
+    'Notice how each sign shows something important about who Jesus is.',
     'Track contrasts: light and darkness, belief and unbelief, sight and blindness.',
-    'Listen for symbols such as water, bread, vine, shepherd, life, and glory.',
-    'Ask how the Cross becomes the hour when Jesus’ self-giving love is revealed.',
+    'Look for symbols such as water, bread, vine, shepherd, life, and glory.',
+    'Ask how the Cross shows Jesus’ self-giving love.',
   ],
   passages: [
     definePassage({

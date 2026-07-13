@@ -203,15 +203,15 @@ export type GospelLesson = {
 
 export const defaultPrompts: PassagePrompts = {
   literal:
-    'What happens in this passage? Who is involved? What would this have meant in its original Gospel context?',
+    'What happens in this passage? Name the main people, place, and action. Use at least one detail from the text.',
   allegorical:
-    'How does this passage reveal Christ, salvation, the Church, the sacraments, or God’s larger plan?',
+    'What does this passage show about Jesus, salvation, the Church, or the sacraments?',
   moral:
-    'How does this passage teach us to live? What virtue, attitude, or action does it call forth?',
+    'How does this passage ask people to live? Name one attitude or action it calls for.',
   anagogical:
-    'How does this passage point toward heaven, eternal life, resurrection, final judgment, or the fullness of God’s Kingdom?',
+    'How does this passage point to resurrection, eternal life, or God’s completed Kingdom?',
   exit:
-    'In 2–3 sentences, explain one thing this passage reveals about Jesus in this Gospel.',
+    'In 2–3 sentences, explain one important thing this passage shows about Jesus.',
 };
 
 export function definePassage(

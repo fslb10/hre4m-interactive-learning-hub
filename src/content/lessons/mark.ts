@@ -3,9 +3,9 @@ import { definePassage, type GospelLesson } from '../types.ts';
 export const markLesson: GospelLesson = {
   id: 'gospel-mark',
   shortName: 'Mark',
-  title: 'Gospel of Mark: On the Way',
-  eyebrow: 'Unit 2 · Discipleship Field Guide',
-  subtitle: 'Move through Mark’s urgent story and test what it means to follow Jesus toward the Cross.',
+  title: 'Mark: Following Jesus on the Way',
+  eyebrow: 'Unit 2 · Gospel of Mark',
+  subtitle: 'Follow Mark’s fast-moving story and learn what it means to follow Jesus, even when it is difficult.',
   symbol: '➜',
   theme: {
     name: 'Field Notes',
@@ -22,10 +22,10 @@ export const markLesson: GospelLesson = {
     },
   },
   gospelLens: [
-    'Feel the pace: repeated movement and urgency press readers toward a decision.',
-    'Watch who recognizes Jesus—and who misunderstands him, including the disciples.',
-    'Notice how power is revealed through healing, service, suffering, and the Cross.',
-    'Ask what following “on the way” costs and how fear can become courageous witness.',
+    'Notice Mark’s fast pace and the many words about movement and action.',
+    'Watch who understands Jesus and who gets him wrong, including the disciples.',
+    'Notice how Jesus shows power through healing, service, suffering, and the Cross.',
+    'Ask what it costs to follow Jesus and how fear can change into courage.',
   ],
   passages: [
     definePassage({

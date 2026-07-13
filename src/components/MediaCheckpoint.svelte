@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { MediaQuestion } from '../content/types';
+  import { protectStudentWriting } from '../utils/studentWriting';
 
   export let mediaId: string;
   export let stage: 'before' | 'after' | 'observation' | 'reflection';
@@ -8,10 +9,10 @@
   export let onResponse: (key: string, value: string) => void = () => {};
 
   const labels = {
-    before: 'Before viewing',
-    after: 'After viewing',
-    observation: 'Observation checkpoint',
-    reflection: 'Audio reflection',
+    before: 'Before you view',
+    after: 'After you view',
+    observation: 'What do you notice?',
+    reflection: 'Think about what you heard',
   };
 
   const responseKey = (questionId: string) => `${mediaId}:${stage}:${questionId}`;
@@ -24,14 +25,15 @@
       <label>
         <span>{question.prompt}</span>
         <textarea
+          use:protectStudentWriting
           rows="3"
           value={responses[responseKey(question.id)] ?? ''}
           on:input={(event) => onResponse(responseKey(question.id), event.currentTarget.value)}
-          placeholder="Record a brief, evidence-based response…"
+          placeholder="Write a short answer in your own words…"
         ></textarea>
       </label>
     {/each}
-    <small>Saved with your passage work on this device.</small>
+    <small>Saved with your passage work. Copy and paste are turned off in student writing boxes.</small>
   </section>
 {/if}
 
